@@ -1,11 +1,13 @@
 package com.udb.dwf.rrhh.pojos;
 
-public class Actualizacion {
-    private int idContratacion;
-    private int idDepartamento;
-    private int idEmpleada;
-    private int idCargo;
-    private int idTipoContratacion;
-    private int fechaContratacion;
-    private double salario;
-    private boolean estado;
+import java.sql.Date;
+
+public class Actualizar {
+
+    private int idEmpleado;
+    private String numeroDui;
+    private String nombrePersona;
+    private String usuario;
+    private String numeroTelefono;
+    private String correoInstitucional;
+    private Date fechaNacimiento;
