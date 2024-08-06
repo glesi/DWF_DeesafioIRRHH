@@ -1,4 +1,4 @@
 package com.udb.dwf.rrhh.repository;
 
-public class TipoContratacionRepository {
+public class ActualizarRepository {
 }
