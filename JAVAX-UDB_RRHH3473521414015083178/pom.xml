@@ -19,9 +19,9 @@
     <dependencies>
         <!-- Dependencia para el driver JDBC de SQL Server -->
         <dependency>
-            <groupId>mysql</groupId>
-            <artifactId>mysql-connector-java</artifactId>
-            <version>8.0.29</version>
+            <groupId>com.microsoft.sqlserver</groupId>
+            <artifactId>mssql-jdbc</artifactId>
+            <version>12.6.3.jre8</version> <!-- O usa la versión más reciente -->
         </dependency>
 
         <dependency>

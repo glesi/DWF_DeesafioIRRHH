@@ -12,7 +12,7 @@ public class Actualizar {
     private String correoInstitucional;
     private Date fechaNacimiento;
 
- public Empleado(int idEmpleado, String numeroDui, String nombrePersona, String usuario, String numeroTelefono, String correoInstitucional, Date fechaNacimiento) {
+ public Actualizar(int idEmpleado, String numeroDui, String nombrePersona, String usuario, String numeroTelefono, String correoInstitucional, Date fechaNacimiento) {
         this.idEmpleado = idEmpleado;
         this.numeroDui = numeroDui;
         this.nombrePersona = nombrePersona;

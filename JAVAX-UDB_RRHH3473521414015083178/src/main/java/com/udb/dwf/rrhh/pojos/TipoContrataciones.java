@@ -4,7 +4,7 @@ public class TipoContrataciones {
     private int idTipoContratacion;
     private String tipoContratacion;
 
-    public TipoContraciones(int idTipoContratacion, String tipoContratacion) {
+    public TipoContrataciones(int idTipoContratacion, String tipoContratacion) {
         this.idTipoContratacion = idTipoContratacion;
         this.tipoContratacion = tipoContratacion;
     }

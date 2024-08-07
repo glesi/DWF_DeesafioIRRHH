@@ -2,5 +2,5 @@ package com.udb.dwf.rrhh.controllers;
 
 import jakarta.servlet.http.HttpServlet;
 
-public class DepartamentoControllers extends HttpServlet {
+public class EmpleadoController extends HttpServlet {
 }
