@@ -42,7 +42,7 @@ public class ContratacionesRepository {
 
         }catch (SQLException e){
             System.err.println("Error al obtener los registros de Contrataciones.Reason: " + e.getMessage());
-        }finally {
+        } finally {
             try {
                 if (resultSet != null) resultSet.close();
                 if (preparedStatement != null) preparedStatement.close();

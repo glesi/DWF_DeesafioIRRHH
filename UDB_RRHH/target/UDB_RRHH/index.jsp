@@ -6,6 +6,6 @@
     <title>Redirection</title>
 </head>
 <body>
-If you are not redirected automatically, follow this <a href="tipoContrataciones">link to TipoContrataciones</a>.
+    If you are not redirected automatically, follow this <a href="tipoContrataciones">link to TipoContrataciones</a>.
 </body>
 </html>

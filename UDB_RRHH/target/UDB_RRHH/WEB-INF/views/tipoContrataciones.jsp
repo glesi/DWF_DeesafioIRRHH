@@ -8,7 +8,6 @@
 <body>
 <h2>Gestión de Tipos de Contratación</h2>
 
-<!-- Formulario para agregar un nuevo tipo de contratación -->
 <h3>Agregar Tipo de Contratación</h3>
 <form action="TipoContratacionController" method="post">
     <input type="hidden" name="action" value="crear">
@@ -17,7 +16,6 @@
     <input type="submit" value="Agregar">
 </form>
 
-<!-- Tabla de listado de tipos de contratación -->
 <h3>Lista de Tipos de Contratación</h3>
 <table border="1">
     <thead>
@@ -41,7 +39,6 @@
     </tbody>
 </table>
 
-<!-- Formulario para editar un tipo de contratación -->
 <c:if test="${not empty tipoContratacionEdicion}">
     <h3>Editar Tipo de Contratación</h3>
     <form action="TipoContratacionController" method="post">
