@@ -1,6 +1,7 @@
 package com.udb.dwf.rrhh.repository;
 
 import com.udb.dwf.rrhh.pojos.Contrataciones;
+import com.udb.dwf.rrhh.pojos.TipoContratacion;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -11,6 +12,7 @@ import java.util.Date;
 import java.util.List;
 
 public class ContratacionesRepository {
+
     public List<Contrataciones> obtenerContratacion(){
         List<Contrataciones> contrataciones = new ArrayList<>();
 
@@ -49,7 +51,6 @@ public class ContratacionesRepository {
                 System.err.println("Error al desconectar la conexion: " + e.getMessage());
             }
         }
-
         return contrataciones;
     }
 
