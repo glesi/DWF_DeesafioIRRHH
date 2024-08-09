@@ -1,6 +1,7 @@
 package com.udb.dwf.rrhh.repository;
 
 import com.udb.dwf.rrhh.pojos.Contrataciones;
+import com.udb.dwf.rrhh.pojos.TipoContratacion;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -11,6 +12,7 @@ import java.util.Date;
 import java.util.List;
 
 public class ContratacionesRepository {
+
     public List<Contrataciones> obtenerContratacion(){
         List<Contrataciones> contrataciones = new ArrayList<>();
 
@@ -40,7 +42,7 @@ public class ContratacionesRepository {
 
         }catch (SQLException e){
             System.err.println("Error al obtener los registros de Contrataciones.Reason: " + e.getMessage());
-        }finally {
+        } finally {
             try {
                 if (resultSet != null) resultSet.close();
                 if (preparedStatement != null) preparedStatement.close();
