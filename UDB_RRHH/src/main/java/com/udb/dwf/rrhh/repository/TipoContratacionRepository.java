@@ -1,6 +1,6 @@
 package com.udb.dwf.rrhh.repository;
 
-import com.udb.dwf.rrhh.pojos.TipoContrataciones;
+import com.udb.dwf.rrhh.pojos.TipoContratacion;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -11,8 +11,8 @@ import java.util.List;
 
 public class TipoContratacionRepository {
 
-    public List<TipoContrataciones> obtenerTipoContrataciones(){
-        List<TipoContrataciones> tipoContratacionesList = new ArrayList<TipoContrataciones>();
+    public List<TipoContratacion> obtenerTipoContrataciones(){
+        List<TipoContratacion> tipoContratacionList = new ArrayList<TipoContratacion>();
 
         Connection connection= null;
         PreparedStatement preparedStatement=  null;
@@ -27,8 +27,8 @@ public class TipoContratacionRepository {
             while(resultSet.next()){
                 int idTipoContratacion = resultSet.getInt("idTipoContratacion");
                 String tipoContratacion = resultSet.getString("tipoContratacion");
-                TipoContrataciones tipoContratacionObj= new TipoContrataciones(idTipoContratacion,tipoContratacion);
-                tipoContratacionesList.add(tipoContratacionObj);
+                TipoContratacion tipoContratacionObj= new TipoContratacion(idTipoContratacion,tipoContratacion);
+                tipoContratacionList.add(tipoContratacionObj);
             }
         } catch (SQLException e){
             System.err.println("Error al obtener los registros de TipoContratacion. Reason: " + e.getMessage());
@@ -42,7 +42,7 @@ public class TipoContratacionRepository {
                 System.err.println("Error al cerrar los recursos. Reason: " + e.getMessage());
             }
         }
-         return tipoContratacionesList;
+         return tipoContratacionList;
 
     }
 }

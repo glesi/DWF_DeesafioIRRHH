@@ -1,12 +1,12 @@
 package com.udb.dwf.rrhh.pojos;
 
-public class Cargos {
+public class Cargo {
     private int idCargo;
     private String cargo;
     private String descripcionCargo;
     private boolean jefatura;
 
-    public Cargos( int idCargo, String cargo , String descripcionCargo , boolean jefatura ) {
+    public Cargo(int idCargo, String cargo , String descripcionCargo , boolean jefatura ) {
         this.idCargo = idCargo;
         this.cargo = cargo;
         this.descripcionCargo = descripcionCargo;

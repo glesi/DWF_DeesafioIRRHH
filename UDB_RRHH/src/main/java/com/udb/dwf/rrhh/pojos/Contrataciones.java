@@ -1,12 +1,14 @@
 package com.udb.dwf.rrhh.pojos;
 
+import java.util.Date;
+
 public class Contrataciones {
     private int idContratacion;
     private int idDepartamento;
     private int idEmpleada;
     private int idCargo;
     private int idTipoContratacion;
-    private int fechaContratacion;
+    private Date fechaContratacion;
     private double salario;
     private boolean estado;
 

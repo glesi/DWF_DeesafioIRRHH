@@ -1,10 +1,10 @@
 package com.udb.dwf.rrhh.pojos;
 
-public class TipoContrataciones {
+public class TipoContratacion {
     private int idTipoContratacion;
     private String tipoContratacion;
 
-    public TipoContrataciones(int idTipoContratacion, String tipoContratacion) {
+    public TipoContratacion(int idTipoContratacion, String tipoContratacion) {
         this.idTipoContratacion = idTipoContratacion;
         this.tipoContratacion = tipoContratacion;
     }

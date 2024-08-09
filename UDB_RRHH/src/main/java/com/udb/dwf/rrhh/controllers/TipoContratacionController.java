@@ -1,7 +1,7 @@
 package com.udb.dwf.rrhh.controllers;
 
-import com.udb.dwf.rrhh.pojos.TipoContrataciones;
-import com.udb.dwf.rrhh.services.TipoContracionesServices;
+import com.udb.dwf.rrhh.pojos.TipoContratacion;
+import com.udb.dwf.rrhh.services.TipoContratacionesServices;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -11,12 +11,12 @@ import java.io.IOException;
 import java.util.List;
 
 public class TipoContratacionController extends HttpServlet {
-    private final TipoContracionesServices tipoContratacionService = new TipoContracionesServices();
+    private final TipoContratacionesServices tipoContratacionService = new TipoContratacionesServices();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        List<TipoContrataciones> tipoContratacionesList = tipoContratacionService.obtenerTodos();
-        request.setAttribute("tipoContrataciones", tipoContratacionesList);
+        List<TipoContratacion> tipoContratacionList = tipoContratacionService.obtenerTodosTipoContratacion();
+        request.setAttribute("tipoContrataciones", tipoContratacionList);
         request.getRequestDispatcher("/WEB-INF/views/tipoContrataciones.jsp").forward(request, response);
     }
 }
