@@ -34,13 +34,13 @@ public class ContratacionesRepository {
                 double salario=resultSet.getDouble("salario");
                 boolean estado=resultSet.getBoolean("estado");
                 Contrataciones contratacionesObj=new Contrataciones(idDepartamento, idEmpleado, idCargo,idTipoContratacion, fechaContratacion, salario, estado);
-                contratacionesList.add(contratacionesObj);
+                contrataciones.add(contratacionesObj);
 
             }
 
         }catch (SQLException e){
             System.err.println("Error al obtener los registros de Contrataciones.Reason: " + e.getMessage());
-        }finally {
+        } finally {
             try {
                 if (resultSet != null) resultSet.close();
                 if (preparedStatement != null) preparedStatement.close();
@@ -50,6 +50,7 @@ public class ContratacionesRepository {
             }
         }
 
+        return contrataciones;
     }
 
 }
