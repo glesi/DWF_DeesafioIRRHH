@@ -34,7 +34,7 @@ public class ContratacionesRepository {
                 double salario=resultSet.getDouble("salario");
                 boolean estado=resultSet.getBoolean("estado");
                 Contrataciones contratacionesObj=new Contrataciones(idDepartamento, idEmpleado, idCargo,idTipoContratacion, fechaContratacion, salario, estado);
-                contratacionesList.add(contratacionesObj);
+                contrataciones.add(contratacionesObj);
 
             }
 
@@ -49,7 +49,7 @@ public class ContratacionesRepository {
                 System.err.println("Error al desconectar la conexion: " + e.getMessage());
             }
         }
-
+        return contrataciones;
     }
 
 }

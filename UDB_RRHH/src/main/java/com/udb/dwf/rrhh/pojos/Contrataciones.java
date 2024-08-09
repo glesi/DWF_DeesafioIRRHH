@@ -12,8 +12,19 @@ public class Contrataciones {
     private double salario;
     private boolean estado;
 
+    public Contrataciones() {}
 
-    public Contrataciones(int idContratacion, int idEmpleada, int idCargo, int idTipoContratacion, int fechaContratacion, Double salario,boolean estado){
+    public Contrataciones(int idDepartamento, int idEmpleada, int idCargo, int idTipoContratacion, Date fechaContratacion, double salario, boolean estado) {
+        this.idDepartamento = idDepartamento;
+        this.idEmpleada = idEmpleada;
+        this.idCargo = idCargo;
+        this.idTipoContratacion = idTipoContratacion;
+        this.fechaContratacion = fechaContratacion;
+        this.salario = salario;
+        this.estado = estado;
+    }
+
+    public Contrataciones(int idContratacion, int idDepartamento, int idEmpleada, int idCargo, int idTipoContratacion, Date fechaContratacion, double salario, boolean estado) {
         this.idContratacion = idContratacion;
         this.idDepartamento = idDepartamento;
         this.idEmpleada = idEmpleada;
@@ -22,7 +33,6 @@ public class Contrataciones {
         this.fechaContratacion = fechaContratacion;
         this.salario = salario;
         this.estado = estado;
-
     }
 
     public int getIdContratacion() {
@@ -65,11 +75,11 @@ public class Contrataciones {
         this.idTipoContratacion = idTipoContratacion;
     }
 
-    public int getFechaContratacion() {
+    public Date getFechaContratacion() {
         return fechaContratacion;
     }
 
-    public void setFechaContratacion(int fechaContratacion) {
+    public void setFechaContratacion(Date fechaContratacion) {
         this.fechaContratacion = fechaContratacion;
     }
 
