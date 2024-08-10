@@ -12,7 +12,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.List;
 
-@WebServlet(name = "EmpleadoController", urlPatterns = {"/empleados"})
+@WebServlet(name = "EmpleadoController", urlPatterns = {"/EmpleadoController"})
 public class EmpleadoController extends HttpServlet {
 
     private final EmpleadoServices empleadoServices = new EmpleadoServices();
@@ -21,11 +21,7 @@ public class EmpleadoController extends HttpServlet {
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
 
-        response.setHeader("Access-Control-Allow-Origin", "*");
-        response.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
-        response.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
-
-        String action = request.getParameter("accion");
+        String action = request.getParameter("action");
 
         switch (action) {
             case "listar":
@@ -110,15 +106,6 @@ public class EmpleadoController extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         processRequest(request, response);
-    }
-
-    @Override
-    protected void doOptions(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        response.setHeader("Access-Control-Allow-Origin", "*");
-        response.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
-        response.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
-        response.setStatus(HttpServletResponse.SC_OK);
     }
 
 }
