@@ -15,15 +15,13 @@ import java.io.PrintWriter;
 import java.util.List;
 
 //Servlet que maneja el CRUD de la Tabla TipoContratacion
-//La anotación @WebServlet declara que esta clase es ocupada como Servlet
-@WebServlet(name = "TipoContratacionController", urlPatterns = "/contratacionController")
 public class TipoContratacionController extends HttpServlet {
 
     //Instancia de la Clase de Servicios de la Tabla TipoContratacion
     private final TipoContratacionesServices tipoContratacionService = new TipoContratacionesServices();
 
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
+            throws IOException {
         String action = request.getParameter("action");
 
         if (action == null) {
@@ -31,10 +29,8 @@ public class TipoContratacionController extends HttpServlet {
         }
 
         switch (action) {
-            case "new" -> showNewForm(request, response);
             case "insert" -> insertTipoContratacion(request, response);
             case "delete" -> deleteTipoContratacion(request, response);
-            case "edit" -> showEditForm(request, response);
             case "update" -> updateTipoContratacion(request, response);
             default -> listTipoContratacion(response);
         }
@@ -57,23 +53,9 @@ public class TipoContratacionController extends HttpServlet {
         out.flush();
     }
 
-    private void showNewForm(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        RequestDispatcher dispatcher = request.getRequestDispatcher("WEB-INF/views/tipoContratacionForm.jsp");
-        dispatcher.forward(request, response);
-    }
-
-    private void showEditForm(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        int id = Integer.parseInt(request.getParameter("id"));
-        TipoContratacion existingTipoContratacion = tipoContratacionService.obtenerTipoContratacionPorId(id);
-        RequestDispatcher dispatcher = request.getRequestDispatcher("WEB-INF/views/tipoContratacionForm.jsp");
-        request.setAttribute("tipoContratacion", existingTipoContratacion);
-        dispatcher.forward(request, response);
-    }
-
     private void insertTipoContratacion(HttpServletRequest request, HttpServletResponse response)
             throws IOException {
+
         String tipoContratacionName = request.getParameter("tipoContratacion");
         TipoContratacion newTipoContratacion = new TipoContratacion(0, tipoContratacionName);
         tipoContratacionService.crearTipoContratacion(newTipoContratacion);
