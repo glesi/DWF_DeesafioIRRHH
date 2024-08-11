@@ -2,6 +2,7 @@ package com.udb.dwf.rrhh.pojos;
 
 import java.sql.Date;
 
+//Pojo para actualizar
 public class Actualizar {
 
     private int idEmpleado;
