@@ -12,7 +12,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.List;
 
-@WebServlet(name = "EmpleadoController", urlPatterns = {"/EmpleadoController"})
+@WebServlet(name = "EmpleadoController", urlPatterns = {"/empleados"})
 public class EmpleadoController extends HttpServlet {
 
     private final EmpleadoServices empleadoServices = new EmpleadoServices();
@@ -25,7 +25,7 @@ public class EmpleadoController extends HttpServlet {
         response.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
         response.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
 
-        String action = request.getParameter("action");
+        String action = request.getParameter("accion");
 
         switch (action) {
             case "listar":
