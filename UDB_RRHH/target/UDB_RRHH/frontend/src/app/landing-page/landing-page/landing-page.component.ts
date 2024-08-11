@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { TipoContratacionService } from '../../../services/tipoContratacionService/tipoContratacion.service';
 
 @Component({
   selector: 'app-landing-page',
@@ -8,5 +9,22 @@ import { Component } from '@angular/core';
   styleUrl: './landing-page.component.css'
 })
 export class LandingPageComponent {
+
+  constructor(private tipoContratacionService: TipoContratacionService) {}
+
+  ngOnInit(): void {
+    this.getTipoContrataciones()
+  }
+
+  getTipoContrataciones() {
+    this.tipoContratacionService.get().subscribe({
+      next: (result) => {
+        console.log(result)
+      },
+      error: (error) => {
+        console.log(error)
+      }
+    })
+  }
 
 }
