@@ -5,6 +5,7 @@ public class Departamento {
     private String nombreDepartamento;
     private String descripcionDepartamento;
 
+    public Departamento(){}
 
     public Departamento(int idDepartamento, String nombreDepartamento, String descripcionDepartamento) {
         this.idDepartamento = idDepartamento;
