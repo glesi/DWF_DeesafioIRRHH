@@ -18,10 +18,6 @@ public class DepartamentoController extends HttpServlet {
     private final DepartamentoServices departamentoServices = new DepartamentoServices();
 
     protected void processRequest(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        response.setHeader("Access-Control-Allow-Origin", "*");
-        response.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
-        response.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
-
         String action = request.getParameter("action");
         if (action == null) {
             action = "list";
@@ -99,14 +95,5 @@ public class DepartamentoController extends HttpServlet {
         int idDepartamento = Integer.parseInt(request.getParameter("id"));
         departamentoServices.eliminarDepartamento(idDepartamento);
         response.sendRedirect("departamento?action=list");
-    }
-
-    @Override
-    protected void doOptions(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        response.setHeader("Access-Control-Allow-Origin", "*");
-        response.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
-        response.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
-        response.setStatus(HttpServletResponse.SC_OK);
     }
 }

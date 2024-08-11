@@ -217,3 +217,7 @@ nbdist/
 .nb-gradle/
 
 # End of https://www.toptal.com/developers/gitignore/api/intellij,java,eclipse,netbeans
+
+#Node
+UDB_RRHH/target/UDB_RRHH/frontend/.angular/
+UDB_RRHH/target/UDB_RRHH/frontend/node_modules/
