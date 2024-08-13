@@ -11,7 +11,7 @@
     </servlet>
     <servlet-mapping>
         <servlet-name>TipoContratacionController</servlet-name>
-        <url-pattern>/tipoContrataciones</url-pattern>
+        <url-pattern>/tipoContrataciones/*</url-pattern>
     </servlet-mapping>
 
     <welcome-file-list>
