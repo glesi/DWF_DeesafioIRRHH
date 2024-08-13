@@ -1,8 +1,9 @@
 package com.udb.dwf.rrhh.controllers;
 
-import com.udb.dwf.rrhh.pojos.TipoContratacion;
-import com.udb.dwf.rrhh.services.TipoContratacionesServices;
+import com.udb.dwf.rrhh.pojos.Empleado;
+import com.udb.dwf.rrhh.services.EmpleadoServices;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -14,11 +15,10 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.List;
 
-//Servlet que maneja el CRUD de la Tabla TipoContratacion
-public class TipoContratacionController extends HttpServlet {
+@WebServlet(name = "EmpleadosController", urlPatterns = {"/empleados/*"})
+public class EmpleadosController extends HttpServlet {
 
-    //Instancia de la Clase de Servicios de la Tabla TipoContratacion
-    private final TipoContratacionesServices tipoContratacionService = new TipoContratacionesServices();
+    private final EmpleadoServices empleadoServices = new EmpleadoServices();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -39,7 +39,7 @@ public class TipoContratacionController extends HttpServlet {
         response.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
 
         String method = request.getMethod();
-        String action = request.getParameter("accion");  // Parámetro de consulta para la acción
+        String action = request.getParameter("accion");
 
         if ("POST".equals(method)) {
             if (action == null) {
@@ -73,21 +73,21 @@ public class TipoContratacionController extends HttpServlet {
 
         switch (action) {
             case "insertar":
-                insertTipoContratacion(request, response);
+                insertEmpleado(request, response);
                 break;
             case "actualizar":
                 if (id == null) {
                     response.sendError(HttpServletResponse.SC_BAD_REQUEST, "ID no proporcionado para actualizar");
                     return;
                 }
-                updateTipoContratacion(id, request, response);
+                updateEmpleado(id, request, response);
                 break;
             case "eliminar":
                 if (id == null) {
                     response.sendError(HttpServletResponse.SC_BAD_REQUEST, "ID no proporcionado para eliminar");
                     return;
                 }
-                deleteTipoContratacion(id, request, response);
+                deleteEmpleado(id, request, response);
                 break;
             default:
                 response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Accion desconocida");
@@ -98,53 +98,44 @@ public class TipoContratacionController extends HttpServlet {
             throws ServletException, IOException {
         String pathInfo = request.getPathInfo();
         if (pathInfo == null || pathInfo.equals("/")) {
-            listTipoContratacion(response);
+            listEmpleados(response);
         } else {
-
             try {
                 Integer id = extractIdFromPathInfo(pathInfo);
-                getTipoContratacionById(id, response);
+                getEmpleadoById(id, response);
             } catch (NumberFormatException e) {
                 response.sendError(HttpServletResponse.SC_BAD_REQUEST, "ID inválido");
             }
         }
     }
 
-    private void getTipoContratacionById(Integer id, HttpServletResponse response)
+    private void getEmpleadoById(Integer id, HttpServletResponse response)
             throws IOException {
-        TipoContratacion tipoContratacion = tipoContratacionService.obtenerTipoContratacionPorId(id);
-        if (tipoContratacion != null) {
+        Empleado empleado = empleadoServices.obtenerEmpleado(id);
+        if (empleado != null) {
             PrintWriter out = response.getWriter();
             response.setContentType("application/json");
             response.setCharacterEncoding("UTF-8");
-            out.println(new JSONObject(tipoContratacion));
+            out.println(new JSONObject(empleado));
             out.flush();
         } else {
-            response.sendError(HttpServletResponse.SC_NOT_FOUND, "Tipo de contratación no encontrado");
+            response.sendError(HttpServletResponse.SC_NOT_FOUND, "Empleado no encontrado");
         }
     }
 
-
-    //Función que manda la lista de los tipos de contratación
-    private void listTipoContratacion(HttpServletResponse response)
+    private void listEmpleados(HttpServletResponse response)
             throws IOException {
-        //De la instancia de la Clase de Servicios, obtenemos los tipos de contratación
-        List<TipoContratacion> tipoContratacionList = tipoContratacionService.obtenerTodosTipoContratacion();
-        //Pasamos la lista de los tipos de contratación a un objeto JSONArray
-        JSONArray json = new JSONArray(tipoContratacionList);
-        //Obtenemos de la respuesta el escritor que nos ayudará a editar la respuesta
+        List<Empleado> empleadosList = empleadoServices.obtenerEmpleados();
+        JSONArray json = new JSONArray(empleadosList);
         PrintWriter out = response.getWriter();
-        //Configuramos la respuesta que el contenido sea "APLICATION/JSON" y que la codificación sea UTF-8
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
-        //Y finalizamos imprimiendo en la respuesta el JSON con la lista de los tipos de contratación
         out.println(json);
         out.flush();
     }
 
-    private void insertTipoContratacion(HttpServletRequest request, HttpServletResponse response)
+    private void insertEmpleado(HttpServletRequest request, HttpServletResponse response)
             throws IOException {
-        // Leer el cuerpo de la petición
         StringBuilder buffer = new StringBuilder();
         BufferedReader reader = request.getReader();
         String line;
@@ -153,20 +144,23 @@ public class TipoContratacionController extends HttpServlet {
         }
         String data = buffer.toString();
 
-        // Parsear el JSON
         JSONObject jsonObject = new JSONObject(data);
-        String tipoContratacionName = jsonObject.getString("tipoContratacion");
+        String nombre = jsonObject.getString("nombrePersona");
+        String usuario = jsonObject.getString("usuario");
+        String dui = jsonObject.getString("numeroDui");
+        String telefono = jsonObject.getString("numeroTelefono");
+        String correo = jsonObject.getString("correoInstitucional");
+        String fechaNacimiento = jsonObject.getString("fechaNacimiento");
 
-        TipoContratacion newTipoContratacion = new TipoContratacion(0, tipoContratacionName);
-        tipoContratacionService.crearTipoContratacion(newTipoContratacion);
+        Empleado newEmpleado = new Empleado(0, dui, nombre, usuario, telefono, correo, java.sql.Date.valueOf(fechaNacimiento));
+        empleadoServices.agregarEmpleado(newEmpleado);
 
-        // Enviar respuesta
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
-        response.getWriter().write("{\"message\": \"Tipo de contratación creado exitosamente\"}");
+        response.getWriter().write("{\"message\": \"Empleado creado exitosamente\"}");
     }
 
-    private void updateTipoContratacion(int id, HttpServletRequest request, HttpServletResponse response)
+    private void updateEmpleado(int id, HttpServletRequest request, HttpServletResponse response)
             throws IOException {
         String pathInfo = request.getPathInfo();
         if (pathInfo != null && pathInfo.length() > 1) {
@@ -180,27 +174,32 @@ public class TipoContratacionController extends HttpServlet {
             String data = buffer.toString();
 
             JSONObject jsonObject = new JSONObject(data);
-            String tipoContratacionName = jsonObject.getString("tipoContratacion");
+            String nombre = jsonObject.getString("nombrePersona");
+            String usuario = jsonObject.getString("usuario");
+            String dui = jsonObject.getString("numeroDui");
+            String telefono = jsonObject.getString("numeroTelefono");
+            String correo = jsonObject.getString("correoInstitucional");
+            String fechaNacimiento = jsonObject.getString("fechaNacimiento");
 
-            TipoContratacion tipoContratacion = new TipoContratacion(id, tipoContratacionName);
-            tipoContratacionService.actualizarTipoContratacion(tipoContratacion);
+            Empleado empleado = new Empleado(id, dui, nombre, usuario, telefono, correo, java.sql.Date.valueOf(fechaNacimiento));
+            empleadoServices.actualizarEmpleado(empleado);
 
             response.setContentType("application/json");
             response.setCharacterEncoding("UTF-8");
-            response.getWriter().write("{\"message\": \"Tipo de contratación actualizado exitosamente\"}");
+            response.getWriter().write("{\"message\": \"Empleado actualizado exitosamente\"}");
         } else {
             response.sendError(HttpServletResponse.SC_BAD_REQUEST, "ID no proporcionado");
         }
     }
 
-    private void deleteTipoContratacion(int id, HttpServletRequest request, HttpServletResponse response)
+    private void deleteEmpleado(int id, HttpServletRequest request, HttpServletResponse response)
             throws IOException {
         String pathInfo = request.getPathInfo();
         if (pathInfo != null && pathInfo.length() > 1) {
-            tipoContratacionService.eliminarTipoContratacion(id);
+            empleadoServices.eliminarEmpleado(id);
             response.setContentType("application/json");
             response.setCharacterEncoding("UTF-8");
-            response.getWriter().write("{\"message\": \"Tipo de contratación eliminado exitosamente\"}");
+            response.getWriter().write("{\"message\": \"Empleado eliminado exitosamente\"}");
         } else {
             response.sendError(HttpServletResponse.SC_BAD_REQUEST, "ID no proporcionado");
         }
