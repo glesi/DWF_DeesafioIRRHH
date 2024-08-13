@@ -5,7 +5,6 @@
             30
         </session-timeout>
     </session-config>
-
     <servlet>
         <servlet-name>TipoContratacionController</servlet-name>
         <servlet-class>com.udb.dwf.rrhh.controllers.TipoContratacionController</servlet-class>

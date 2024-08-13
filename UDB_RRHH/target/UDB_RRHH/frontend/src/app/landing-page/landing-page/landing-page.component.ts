@@ -13,7 +13,6 @@ export class LandingPageComponent {
   constructor(private tipoContratacionService: TipoContratacionService) {}
 
   ngOnInit(): void {
-    this.getTipoContrataciones()
     this.saveTipoContrataciones()
   }
 

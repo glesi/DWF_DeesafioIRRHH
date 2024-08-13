@@ -20,7 +20,7 @@ public class EmpleadoRepository {
 
         try {
             connection = Conexion.getConexion();
-            String query = "INSERT INTO Empleados (numeroDui,nombrePersona,usuario,numeroTelefono,correoInstitucional,fechaNacimiento) VALUES (?,?,?,?,?,?)";
+            String query = "INSERT INTO Empleado (numeroDui,nombrePersona,usuario,numeroTelefono,correoInstitucional,fechaNacimiento) VALUES (?,?,?,?,?,?)";
             preparedStatement = connection.prepareStatement(query, PreparedStatement.RETURN_GENERATED_KEYS);
             preparedStatement.setString(1, empleado.getNumeroDui());
             preparedStatement.setString(2, empleado.getNombrePersona());
@@ -63,13 +63,13 @@ public class EmpleadoRepository {
 
         try{
             connection= Conexion.getConexion();
-            String query= "SELECT idEmpleado, numeroDui, nombrePersona, usuario, numeroTelefono, correoInstitucional, fechaNacimiento FROM Empleados";
+            String query= "SELECT idEmpleado, numeroDui,nombrePersona,usuario,numeroTelefono,correoInstitucional,fechaNacimiento FROM Empleado";
             preparedStatement= connection.prepareStatement(query);
             resultSet = preparedStatement.executeQuery();
 
             while(resultSet.next()){
                 int idEmpleado = resultSet.getInt("idEmpleado");
-                String numeroDui = resultSet.getString("numeroDui");
+                String numeroDui = resultSet.getString(" numeroDui");
                 String nombrePersona = resultSet.getString("nombrePersona");
                 String usuario = resultSet.getString("usuario");
                 String numeroTelefono = resultSet.getString("numeroTelefono");
@@ -101,15 +101,15 @@ public class EmpleadoRepository {
 
         try {
             connection = Conexion.getConexion();
-            String query = "UPDATE Empleados SET numeroDui = ?, nombrePersona = ?, usuario = ?, numeroTelefono = ?, correoInstitucional = ?, fechaNacimiento = ? WHERE idepartamento = ?";
+            String query = "UPDATE  SET idEmpleado, numeroDui,nombrePersona,usuario,numeroTelefono,correoInstitucional,fechaNacimiento = ?, WHERE idepartamento = ?";
             preparedStatement = connection.prepareStatement(query);
-            preparedStatement.setString(1, empleado.getNumeroDui());
-            preparedStatement.setString( 2, empleado.getNombrePersona());
-            preparedStatement.setString( 3, empleado.getUsuario());
-            preparedStatement.setString( 4, empleado.getNumeroTelefono());
-            preparedStatement.setString( 5, empleado.getCorreoInstitucional());
-            preparedStatement.setDate( 6, empleado.getFechaNacimiento());
-            preparedStatement.setInt(7, empleado.getIdEmpleado());
+            preparedStatement.setInt(1, empleado.getIdEmpleado());
+            preparedStatement.setString(2, empleado.getNumeroDui());
+            preparedStatement.setString( 3, empleado.getNombrePersona());
+            preparedStatement.setString( 4, empleado.getUsuario());
+            preparedStatement.setString( 5, empleado.getNumeroTelefono());
+            preparedStatement.setString( 6, empleado.getCorreoInstitucional());
+            preparedStatement.setDate( 7, empleado.getFechaNacimiento());
 
             int affectedRows = preparedStatement.executeUpdate();
             return affectedRows > 0;
@@ -134,7 +134,7 @@ public class EmpleadoRepository {
 
         try {
             connection = Conexion.getConexion();
-            String query = "DELETE FROM Empleados WHERE idEmpleado = ?";
+            String query = "DELETE FROM Empleado WHERE idEmpleado = ?";
             preparedStatement = connection.prepareStatement(query);
             preparedStatement.setInt(1, idEmpleado);
 
@@ -161,7 +161,7 @@ public class EmpleadoRepository {
 
         try {
             connection = Conexion.getConexion();
-            String query = "SELECT idEmpleado, numeroDui,nombrePersona,usuario,numeroTelefono,correoInstitucional,fechaNacimiento FROM Empleados WHERE idEmpleado = ?";
+            String query = "SELECT idEmpleado, numeroDui,nombrePersona,usuario,numeroTelefono,correoInstitucional,fechaNacimiento FROM Empleado WHERE idEmpleado = ?";
             preparedStatement = connection.prepareStatement(query);
             preparedStatement.setInt(1, idEmpleado);
             resultSet = preparedStatement.executeQuery();
