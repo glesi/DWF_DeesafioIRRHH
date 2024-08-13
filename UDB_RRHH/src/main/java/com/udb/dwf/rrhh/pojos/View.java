@@ -2,7 +2,7 @@ package com.udb.dwf.rrhh.pojos;
 
 import java.sql.Date;
 
-public class View {
+public class View extends {
     private int idEmpleado;
     private String numeroDui;
     private String nombrePersona;

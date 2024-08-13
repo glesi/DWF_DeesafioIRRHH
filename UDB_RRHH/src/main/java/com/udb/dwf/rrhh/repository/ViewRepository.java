@@ -42,4 +42,38 @@ public class ViewRepository {
         return views;
 
     }
+
+    public View getViewById(int id) {
+        View viewObj = null;
+        Connection con = null;
+        try{
+            con = Conexion.getConexion();
+            String query = "{call ObtenerDatosEmpleadosById(idEmpleado)}";
+            try(CallableStatement sp = con.prepareCall(query)){
+                try(ResultSet rs= sp.executeQuery()){
+                    while (rs.next()) {
+                        int idEmpleado = rs.getInt("idEmpleado");
+                        String numeroDui = rs.getString("numeroDui");
+                        String nombrePersona = rs.getString("nombrePersona");
+                        String numeroTelefono = rs.getString("numeroTelefono");
+                        String correoInstitucional = rs.getString("correoInstitucional");
+                        String cargo = rs.getString("cargo");
+                        Date fechaContratacion = rs.getDate("fechaNacimiento");
+                        double salario = rs.getDouble("salario");
+                        Date fechaNacimiento = rs.getDate("fechaNacimiento");
+                        viewObj = new View(idEmpleado,numeroDui,nombrePersona,numeroTelefono,correoInstitucional,cargo,fechaContratacion,salario,fechaNacimiento);
+                    }
+                }catch(SQLException e){
+                    System.out.println("Error al intentar obtener registro de empleado "+id+"."+e.getMessage());
+                }
+
+            }catch (SQLException e) {
+                System.out.println("Error al intentar ejecutar storeed procedure"+e.getMessage());
+            }
+        }finally {
+            if (con != null) Conexion.desconectar();
+        }
+        return viewObj;
+
+    }
 }

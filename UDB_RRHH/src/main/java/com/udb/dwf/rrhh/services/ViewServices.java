@@ -8,7 +8,13 @@ import java.util.List;
 public class ViewServices {
     private final ViewRepository viewRepository = new ViewRepository();
 
+    //read
     public List<View> getViews(){
         return viewRepository.getViews();
+    }
+
+    //Obtener detalles de empleado por ID
+    public View getViewById(int idEmpleado){
+        return viewRepository.getViewById(idEmpleado);
     }
 }
