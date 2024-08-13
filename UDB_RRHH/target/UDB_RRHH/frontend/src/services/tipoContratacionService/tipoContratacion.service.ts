@@ -8,11 +8,11 @@ import { Observable } from 'rxjs';
 export class TipoContratacionService {
 
   object : any = {
-    'json': {
-      'idTipoContratacion': 2,
-      'tipoContratacion': "Medio Tiempo"
+    "json": {
+      "idTipoContratacion": 2,
+      "tipoContratacion": "Medio Tiempo"
     },
-    'action': 'insert'
+    "action": "insertar"
   }
 
   API_URL : string = 'http://localhost:8080/UDB_RRHH/tipoContrataciones';
