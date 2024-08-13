@@ -13,8 +13,6 @@ export class LandingPageComponent {
   constructor(private tipoContratacionService: TipoContratacionService) {}
 
   ngOnInit(): void {
-    console.log(this.getTipoContrataciones())
-    this.saveTipoContrataciones()
   }
 
   object : any = {
@@ -47,4 +45,33 @@ export class LandingPageComponent {
     })
   }
 
+  updateTipoContrataciones() {
+    //Agregar objeto
+    var object = {
+      "action": "actualizar"
+    }
+    this.tipoContratacionService.post(object).subscribe({
+      next: (result) => {
+        console.log(result)
+      },
+      error: (error) => {
+        console.log(error)
+      }
+    })
+  }
+
+  deleteTipoContrataciones() {
+    //Agregar objeto
+    var object = {
+      "action": "eliminar"
+    }
+    this.tipoContratacionService.post(object).subscribe({
+      next: (result) => {
+        console.log(result)
+      },
+      error: (error) => {
+        console.log(error)
+      }
+    })
+  }
 }
