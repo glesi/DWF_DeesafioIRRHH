@@ -1,5 +1,8 @@
 package com.udb.dwf.rrhh.controllers;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.udb.dwf.rrhh.pojos.Departamento;
 import com.udb.dwf.rrhh.pojos.Departamento;
 import com.udb.dwf.rrhh.services.DepartamentoServices;
 import jakarta.servlet.ServletException;
@@ -14,114 +17,69 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.List;
+import java.util.stream.Collectors;
 
-@WebServlet(name = "DepartamentoController", urlPatterns = "/departamento/*")
+//Servlet que maneja el CRUD de la Tabla Departamento
 public class DepartamentoController extends HttpServlet {
 
-    private final DepartamentoServices departamentoServices = new DepartamentoServices();
+    //Creador GSON para crear objetos desde un JSON
+    Gson gson = new GsonBuilder().create();
 
-    @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        processRequest(request, response);
+    //Instancia de la Clase de Servicios de la Tabla Departamento
+    private final DepartamentoServices services = new DepartamentoServices();
+
+    //Función que manda la lista de los departamentos
+    private void listDepartamento(HttpServletResponse response)
+            throws IOException {
+        //De la instancia de la Clase de Servicios, obtenemos los departamentos
+        List<Departamento> departamentos = services.obtenerDepartamentos();
+        //Pasamos la lista de los departamentos a un objeto JSONArray
+        JSONArray json = new JSONArray(departamentos);
+        //Obtenemos de la respuesta el writer que nos ayudará a editar la respuesta
+        PrintWriter out = response.getWriter();
+        //Configuramos la respuesta que el contenido sea "APPLICATION/JSON" y que la codificación sea UTF-8
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+        //Y finalizamos imprimiendo en la respuesta el JSON con la lista de los departamentos
+        out.println(json);
+        out.flush();
     }
 
-    @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        processRequest(request, response);
-    }
 
-    @Override
-    protected void doOptions(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        setAccessControlHeaders(response);
-        response.setStatus(HttpServletResponse.SC_OK);
-    }
-
-    protected void processRequest(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        response.setHeader("Access-Control-Allow-Origin", "*");
-        response.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
-        response.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
-
-        String method = request.getMethod();
-        String action = request.getParameter("accion");
-
-        if ("POST".equals(method)) {
-            if (action == null) {
-                response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Acción no especificada");
-                return;
-            }
-            processPostRequest(action, request, response);
-        } else if ("GET".equals(method)) {
-            processGetRequest(request, response);
-        } else {
-            response.sendError(HttpServletResponse.SC_NOT_IMPLEMENTED, "Método no implementado");
-        }
-    }
-
-    private void processPostRequest(String action, HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        String pathInfo = request.getPathInfo();
-
-        Integer id = extractIdFromPathInfo(pathInfo);
-
-        switch (action) {
-            case "insertar":
-                insertDepartamento(request, response);
-                break;
-            case "actualizar":
-                if (id == null) {
-                    response.sendError(HttpServletResponse.SC_BAD_REQUEST, "ID no proporcionado para actualizar");
-                    return;
-                }
-                updateDepartamento(id, request, response);
-                break;
-            case "eliminar":
-                if (id == null) {
-                    response.sendError(HttpServletResponse.SC_BAD_REQUEST, "ID no proporcionado para eliminar");
-                    return;
-                }
-                deleteDepartamento(id, request, response);
-                break;
-            default:
-                response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Acción desconocida");
-        }
-    }
-
-    private void processGetRequest(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        String pathInfo = request.getPathInfo();
-        if (pathInfo == null || pathInfo.equals("/")) {
-            listDepartamentos(response);
-        } else {
-            try {
-                Integer id = extractIdFromPathInfo(pathInfo);
-                getDepartamentoById(id, response);
-            } catch (NumberFormatException e) {
-                response.sendError(HttpServletResponse.SC_BAD_REQUEST, "ID inválido");
-            }
-        }
-    }
-
+    //Función que extrae el ID del URL
     private Integer extractIdFromPathInfo(String pathInfo) throws ServletException {
+        /*
+            Se identifica si el URL no contiene algún ID,
+            si no lo tiene, retorna nulo
+         */
         if (pathInfo == null || pathInfo.equals("/")) {
-            throw new ServletException("Ruta inválida.");
+            throw new ServletException("Ruta invalida.");
         }
+        /*
+            Realiza el cambio de string a Integer,
+            si no lo tiene, entonces da un NumberFormatException.
+         */
         try {
-            return Integer.parseInt(pathInfo.substring(1)); // Extrae el ID de la URL
+            return Integer.parseInt(pathInfo.substring(1));  // Extrae el ID de la URL
         } catch (NumberFormatException e) {
             throw new ServletException("ID inválido");
         }
     }
 
-    private void listDepartamentos(HttpServletResponse response) throws IOException {
-        List<Departamento> listaDepartamentos = departamentoServices.obtenerDepartamentos();
-        JSONArray json = new JSONArray(listaDepartamentos);
-        PrintWriter out = response.getWriter();
-        response.setContentType("application/json");
-        response.setCharacterEncoding("UTF-8");
-        out.println(json);
-        out.flush();
-    }
-
-    private void getDepartamentoById(Integer id, HttpServletResponse response) throws IOException {
-        Departamento departamento = departamentoServices.obtenerDepartamento(id);
+    //Función que obtiene el departamento seleccionado por ID
+    private void getDepartamentoById(Integer id, HttpServletResponse response)
+            throws IOException {
+        /*
+            Se llama al servicio para obtener con el parámetro del ID al departamento
+            que se necesita
+         */
+        Departamento departamento = services.obtenerDepartamento(id);
+        /*
+            Verifica si el departamento es distinto de nulo,
+            si es distinto de nulo, se obtiene el writer de la respuesta para enviar
+            el departamento, si no,
+            envía un error con el mensaje que no se encontró el departamento deseado
+         */
         if (departamento != null) {
             PrintWriter out = response.getWriter();
             response.setContentType("application/json");
@@ -133,66 +91,176 @@ public class DepartamentoController extends HttpServlet {
         }
     }
 
-    private void insertDepartamento(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        StringBuilder buffer = new StringBuilder();
-        BufferedReader reader = request.getReader();
-        String line;
-        while ((line = reader.readLine()) != null) {
-            buffer.append(line);
+    //Función que añade un departamento nuevo
+    private void insertDepartamento(Departamento object, HttpServletResponse response)
+            throws IOException {
+        //Se llama al servicio con la función de agregarDepartamento enviando el objeto como parámetro
+        services.agregarDepartamento(object);
+        //Se crea el json del mensaje a enviar que se ha creado exitosamente
+        JSONObject json = new JSONObject();
+        json.put("message", "Departamento creado exitosamente");
+        response.getWriter().println(json);
+    }
+
+    //Función que actualiza un departamento agregado anteriormente
+    private void updateDepartamento(Departamento object, HttpServletResponse response)
+            throws IOException {
+        //Se llama al servicio con la función de actualizarDepartamento enviando el objeto como parámetro
+        services.actualizarDepartamento(object);
+        //Se crea el json del mensaje a enviar que se ha actualizado exitosamente
+        JSONObject json = new JSONObject();
+        json.put("message", "Departamento actualizado exitosamente");
+        response.getWriter().println(json);
+    }
+
+    //Función que elimina un departamento
+    private void deleteDepartamento(int id, HttpServletResponse response)
+            throws IOException {
+        //Se llama al servicio con la función de eliminarDepartamento enviando el ID como parámetro
+        services.eliminarDepartamento(id);
+        //Se crea el json del mensaje a enviar que se ha eliminado exitosamente
+        JSONObject json = new JSONObject();
+        json.put("message", "Departamento eliminado exitosamente");
+        response.getWriter().println(json);
+    }
+
+    //Función que procesa las peticiones en general
+    protected void processRequest(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        //Se inserta los headers necesarios para evitar error CORS
+        setAccessControlHeaders(response);
+        //Se obtiene el método que se ocupará
+        String method = request.getMethod();
+        /*
+            Verifica que método se ocupará, si es POST realizará el procedimiento para la petición POST,
+            si es GET, realizara el procedimiento para la petición GET,
+            si no, tirará error que no existe algún método implementado
+         */
+        if ("POST".equals(method)) {
+            //Se obtiene los datos del Body
+            String requestData = request.getReader().lines().collect(Collectors.joining());
+            //Transforma el Body a JSON
+            JSONObject bodyJSON = new JSONObject(requestData);
+            //Se obtiene la acción que se ejecutará
+            String action = bodyJSON.getString("action");
+            //Se obtiene el JSON a utilizar y luego lo transforma al objeto Departamento
+            String jsonString = bodyJSON.getJSONObject("json").toString();
+            Departamento object = gson.fromJson(jsonString, Departamento.class);
+            /*
+                Si la acción es nula, tirará el error de que no sé específico la acción
+             */
+            if (action == null) {
+                response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Acción no especificada");
+                return;
+            }
+            //Se llama la función que realizará el procedimiento de la petición POST
+            processPostRequest(action, object, response);
+        } else if ("GET".equals(method)) {
+            //Se llama la función que realizará el procedimiento de la petición GET
+            processGetRequest(request, response);
+        } else {
+            response.sendError(HttpServletResponse.SC_NOT_IMPLEMENTED, "Método no implementado");
         }
-        String data = buffer.toString();
-
-        JSONObject jsonObject = new JSONObject(data);
-        String nombreDepartamento = jsonObject.getString("nombreDepartamento");
-        String descripcionDepartamento = jsonObject.getString("descripcionDepartamento");
-
-        Departamento departamento = new Departamento();
-        departamento.setNombreDepartamento(nombreDepartamento);
-        departamento.setDescripcionDepartamento(descripcionDepartamento);
-
-        departamentoServices.agregarDepartamento(departamento);
-
-        response.setContentType("application/json");
-        response.setCharacterEncoding("UTF-8");
-        response.getWriter().write("{\"message\": \"Departamento creado exitosamente\"}");
     }
 
-    private void updateDepartamento(int id, HttpServletRequest request, HttpServletResponse response) throws IOException {
-        StringBuilder buffer = new StringBuilder();
-        BufferedReader reader = request.getReader();
-        String line;
-        while ((line = reader.readLine()) != null) {
-            buffer.append(line);
+
+    //Función que procesa una petición GET
+    private void processGetRequest(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        //Obtiene los parámetros de la URL
+        String pathInfo = request.getPathInfo();
+        /*
+            Si no existe algún parámetro llama a la función para obtener todos los departamentos,
+            sino, se llama la función para obtener el departamento por ID
+         */
+        if (pathInfo == null || pathInfo.equals("/")) {
+            listDepartamento(response);
+        } else {
+            /*
+                Se realiza un try para verificara que lo que trae el parámetro sea un número,
+                si no trae un número, dará error NumberFormatException
+             */
+            try {
+                //Se llama la función extractIdFromPathInfo para obtener el ID
+                Integer id = extractIdFromPathInfo(pathInfo);
+                //Se llama la función para obtener el departamento
+                getDepartamentoById(id, response);
+            } catch (NumberFormatException e) {
+                response.sendError(HttpServletResponse.SC_BAD_REQUEST, "ID inválido");
+            }
         }
-        String data = buffer.toString();
-
-        JSONObject jsonObject = new JSONObject(data);
-        String nombreDepartamento = jsonObject.getString("nombreDepartamento");
-        String descripcionDepartamento = jsonObject.getString("descripcionDepartamento");
-
-        Departamento departamento = new Departamento();
-        departamento.setIdDepartamento(id);
-        departamento.setNombreDepartamento(nombreDepartamento);
-        departamento.setDescripcionDepartamento(descripcionDepartamento);
-
-        departamentoServices.actualizarDepartamento(departamento);
-
-        response.setContentType("application/json");
-        response.setCharacterEncoding("UTF-8");
-        response.getWriter().write("{\"message\": \"Departamento actualizado exitosamente\"}");
     }
 
-    private void deleteDepartamento(int id, HttpServletRequest request, HttpServletResponse response) throws IOException {
-        departamentoServices.eliminarDepartamento(id);
-        response.setContentType("application/json");
-        response.setCharacterEncoding("UTF-8");
-        response.getWriter().write("{\"message\": \"Departamento eliminado exitosamente\"}");
+
+    //Función que procesa una petición POST
+    private void processPostRequest(String action, Departamento object, HttpServletResponse response)
+            throws IOException {
+
+        //Se obtiene el ID del departamento
+        int id = object.getIdDepartamento();
+        /*
+            Se realiza un switch con la acción que se realizará,
+            si la acción es "insertar", se llamará la función para añadir el departamento,
+            si la acción es "actualizar", se llamará la función para actualizar el departamento,
+            si la acción es "eliminar", se llamará la función para eliminar el departamento,
+            y si no obtiene alguno de los datos anteriores, tirará error de que es una acción desconocida
+         */
+        switch (action) {
+            case "insertar" -> insertDepartamento(object, response);
+            case "actualizar" -> {
+                /*
+                    Verifica que el ID sea cero,
+                    si es cero, tira un error de que no se ha proporcionado un ID
+                 */
+                if (id == 0) {
+                    response.sendError(HttpServletResponse.SC_BAD_REQUEST, "ID no proporcionado para actualizar");
+                    return;
+                }
+                updateDepartamento(object, response);
+            }
+            case "eliminar" -> {
+                /*
+                    Verifica que el ID sea cero,
+                    si es cero, tira un error de que no se ha proporcionado un ID
+                 */
+                if (id == 0) {
+                    response.sendError(HttpServletResponse.SC_BAD_REQUEST, "ID no proporcionado para eliminar");
+                    return;
+                }
+                deleteDepartamento(id, response);
+            }
+            default -> response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Acción desconocida");
+        }
     }
 
+    //Función que inserta los headers para evitar error de CORS
     private void setAccessControlHeaders(HttpServletResponse response) {
         response.setHeader("Access-Control-Allow-Origin", "*");
         response.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
-        response.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
+        response.setHeader("Access-Control-Allow-Headers", "*");
         response.setHeader("Access-Control-Max-Age", "3600");
     }
+
+
+    //Función que recibe las peticiones GET
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        processRequest(request, response);
+    }
+
+    //Función que recibe las peticiones POST
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        processRequest(request, response);
+    }
+
+    //Función que recibe las peticiones OPTIONS
+    @Override
+    protected void doOptions(HttpServletRequest request, HttpServletResponse response) {
+        setAccessControlHeaders(response);
+        response.setStatus(HttpServletResponse.SC_OK);
+    }
+
 }
