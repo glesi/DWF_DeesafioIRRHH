@@ -1,5 +1,7 @@
 package com.udb.dwf.rrhh.controllers;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.udb.dwf.rrhh.pojos.View;
 import com.udb.dwf.rrhh.services.ViewServices;
 import jakarta.servlet.ServletException;
@@ -13,8 +15,11 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class ViewController extends HttpServlet {
+
+    Gson gson = new GsonBuilder().create();
 
     private final ViewServices viewService = new ViewServices ();
 
@@ -37,7 +42,12 @@ public class ViewController extends HttpServlet {
         resp.setHeader("Access-Control-Max-Headers","Content-Type,Authorization");
 
         String method = req.getMethod();
-        String action = req.getParameter("accion");
+        String requestData = req.getReader().lines().collect(Collectors.joining());
+        JSONObject json = new JSONObject(requestData);
+        String action = json.getString("action");
+        String jsonString = json.getString("action").toLowerCase();
+
+        View obj = gson.fromJson(jsonString, View.class);
 
         if("GET".equals(method)){
             processGetRequest(req,resp);

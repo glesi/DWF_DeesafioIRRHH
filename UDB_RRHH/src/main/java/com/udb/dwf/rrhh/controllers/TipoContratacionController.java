@@ -9,6 +9,7 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -43,21 +44,29 @@ public class TipoContratacionController extends HttpServlet {
         response.setHeader("Access-Control-Allow-Headers", "*");
         String method = request.getMethod(); // Parámetro de consulta para la acción
         String requestData = request.getReader().lines().collect(Collectors.joining());
-        JSONObject bodyJSON = new JSONObject(requestData);
-        String action = bodyJSON.getString("action");
-        String jsonString = bodyJSON.getJSONObject("json").toString();
-        TipoContratacion object = gson.fromJson(jsonString, TipoContratacion.class);
-        if ("POST".equals(method)) {
-            if (action == null) {
-                response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Accion no especificada");
-                return;
+        System.out.println("Request Data: " + requestData);
+        try{
+            JSONObject bodyJSON = new JSONObject(requestData);
+            String action = bodyJSON.getString("action");
+            String jsonString = bodyJSON.getJSONObject("json").toString();
+            TipoContratacion object = gson.fromJson(jsonString, TipoContratacion.class);
+
+            if ("POST".equals(method)) {
+                if (action == null) {
+                    response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Accion no especificada");
+                    return;
+                }
+                processPostRequest(action, object, request, response);
+            } else if ("GET".equals(method)) {
+                processGetRequest(request, response);
+            } else {
+                response.sendError(HttpServletResponse.SC_NOT_IMPLEMENTED, "Método no implementado");
             }
-            processPostRequest(action, object, request, response);
-        } else if ("GET".equals(method)) {
-            processGetRequest(request, response);
-        } else {
-            response.sendError(HttpServletResponse.SC_NOT_IMPLEMENTED, "Método no implementado");
+        }catch (JSONException e){
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST,"Bad req. "+e.getMessage());
         }
+
+
     }
 
     private Integer extractIdFromPathInfo(String pathInfo) throws ServletException {
