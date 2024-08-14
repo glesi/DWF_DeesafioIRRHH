@@ -22,6 +22,14 @@
         <url-pattern>/empleados</url-pattern>
     </servlet-mapping>
     <servlet>
+        <servlet-name>DepartamentoController</servlet-name>
+        <servlet-class>com.udb.dwf.rrhh.controllers.DepartamentoController</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>DepartamentoController</servlet-name>
+        <url-pattern>/departamentos</url-pattern>
+    </servlet-mapping>
+    <servlet>
         <servlet-name>CargoController</servlet-name>
         <servlet-class>com.udb.dwf.rrhh.controllers.CargoController</servlet-class>
     </servlet>
