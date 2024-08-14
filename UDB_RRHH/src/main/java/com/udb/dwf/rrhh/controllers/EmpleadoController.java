@@ -2,42 +2,43 @@ package com.udb.dwf.rrhh.controllers;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.udb.dwf.rrhh.pojos.TipoContratacion;
-import com.udb.dwf.rrhh.services.TipoContratacionesServices;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
+
+import com.udb.dwf.rrhh.pojos.Empleado;
+import com.udb.dwf.rrhh.services.EmpleadoServices;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.json.JSONArray;
 import org.json.JSONObject;
+
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.List;
 import java.util.stream.Collectors;
 
-//Servlet que maneja el CRUD de la Tabla TipoContratacion
-public class TipoContratacionController extends HttpServlet {
+//Servlet que maneja el CRUD de la Tabla Empleaddo
+public class EmpleadoController extends HttpServlet {
 
     //Creador GSON para crear objetos desde un JSON
     Gson gson = new GsonBuilder().create();
 
+    //Instancia de la Clase de Servicios de la Tabla Empleados
+    private final EmpleadoServices services = new EmpleadoServices();
 
-    //Instancia de la Clase de Servicios de la Tabla TipoContratacion
-    private final TipoContratacionesServices services = new TipoContratacionesServices();
-
-    //Función que manda la lista de los tipos de contratación
-    private void listTipoContratacion(HttpServletResponse response)
+    //Función que manda la lista de los empleados
+    private void listEmpleados(HttpServletResponse response)
             throws IOException {
-        //De la instancia de la Clase de Servicios, obtenemos los tipos de contratación
-        List<TipoContratacion> tipoContratacionList = services.obtenerTodosTipoContratacion();
-        //Pasamos la lista de los tipos de contratación a un objeto JSONArray
-        JSONArray json = new JSONArray(tipoContratacionList);
+        //De la instancia de la Clase de Servicios, obtenemos los empleados
+        List<Empleado> EmpleadoList = services.obtenerEmpleados();
+        //Pasamos la lista de los empleados a un objeto JSONArray
+        JSONArray json = new JSONArray(EmpleadoList);
         //Obtenemos de la respuesta el writer que nos ayudará a editar la respuesta
         PrintWriter out = response.getWriter();
         //Configuramos la respuesta que el contenido sea "APPLICATION/JSON" y que la codificación sea UTF-8
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
-        //Y finalizamos imprimiendo en la respuesta el JSON con la lista de los tipos de contratación
+        //Y finalizamos imprimiendo en la respuesta el JSON con la lista de los empleados
         out.println(json);
         out.flush();
     }
@@ -50,7 +51,7 @@ public class TipoContratacionController extends HttpServlet {
             si no lo tiene, retorna nulo
          */
         if (pathInfo == null || pathInfo.equals("/")) {
-            throw new ServletException("Ruta invalida.");
+            return null;
         }
         /*
             Realiza el cambio de string a Integer,
@@ -63,61 +64,61 @@ public class TipoContratacionController extends HttpServlet {
         }
     }
 
-    //Función que obtiene el tipo de contratación seleccionado por ID
-    private void getTipoContratacionById(Integer id, HttpServletResponse response)
+    //Función que obtiene el Empleado seleccionado por ID
+    private void getEmpleadoById(Integer id, HttpServletResponse response)
             throws IOException {
         /*
-            Se llama al servicio para obtener con el parámetro del ID al tipo de contratación
+            Se llama al servicio para obtener con el parámetro del ID al Empleado
             que se necesita
          */
-        TipoContratacion tipoContratacion = services.obtenerTipoContratacionPorId(id);
+        Empleado empleado = services.obtenerEmpleado(id);
         /*
-            Verifica si el tipo de contratación es distinto de nulo,
+            Verifica si el Empleado es distinto de nulo,
             si es distinto de nulo, se obtiene el writer de la respuesta para enviar
-            el tipo de contratación, si no,
-            envía un error con el mensaje que no se encontró el tipo de contratación deseado
+            el Empleado, si no,
+            envía un error con el mensaje que no se encontró el Empleado deseado
          */
-        if (tipoContratacion != null) {
+        if (empleado != null) {
             PrintWriter out = response.getWriter();
             response.setContentType("application/json");
             response.setCharacterEncoding("UTF-8");
-            out.println(new JSONObject(tipoContratacion));
+            out.println(new JSONObject(empleado));
             out.flush();
         } else {
-            response.sendError(HttpServletResponse.SC_NOT_FOUND, "Tipo de contratación no encontrado");
+            response.sendError(HttpServletResponse.SC_NOT_FOUND, "Empleado no encontrado");
         }
     }
 
-    //Función que añade un tipo de contratación nuevo
-    private void insertTipoContratacion(TipoContratacion object, HttpServletResponse response)
+    //Función que añade un Empleado nuevo
+    private void insertEmpleado(Empleado object, HttpServletResponse response)
             throws IOException {
-        //Se llama al servicio con la función de crearTipoContratación enviando el objeto como parámetro
-        services.crearTipoContratacion(object);
+        //Se llama al servicio con la función de agregarEmpleado enviando el objeto como parámetro
+        services.agregarEmpleado(object);
         //Se crea el json del mensaje a enviar que se ha creado exitosamente
         JSONObject json = new JSONObject();
-        json.put("message", "Tipo de contratación creado exitosamente");
+        json.put("message", "Empleado creado exitosamente");
         response.getWriter().println(json);
     }
 
-    //Función que actualiza un tipo de contratación agregado anteriormente
-    private void updateTipoContratacion(TipoContratacion object, HttpServletResponse response)
+    //Función que actualiza un Empleado agregado anteriormente
+    private void updateEmpleado(Empleado object, HttpServletResponse response)
             throws IOException {
-        //Se llama al servicio con la función de actualizarTipoContratación enviando el objeto como parámetro
-        services.actualizarTipoContratacion(object);
+        //Se llama al servicio con la función de actualizarEmpleado enviando el objeto como parámetro
+        services.actualizarEmpleado(object);
         //Se crea el json del mensaje a enviar que se ha actualizado exitosamente
         JSONObject json = new JSONObject();
-        json.put("message", "Tipo de contratación actualizado exitosamente");
+        json.put("message", "Empleado actualizado exitosamente");
         response.getWriter().println(json);
     }
 
-    //Función que elimina un tipo de contratación
-    private void deleteTipoContratacion(int id, HttpServletResponse response)
+    //Función que elimina un Empleado
+    private void deleteEmpleado(int id, HttpServletResponse response)
             throws IOException {
-        //Se llama al servicio con la función de eliminarTipoContratacion enviando el ID como parámetro
-        services.eliminarTipoContratacion(id);
+        //Se llama al servicio con la función de eliminarEmpleado enviando el ID como parámetro
+        services.eliminarEmpleado(id);
         //Se crea el json del mensaje a enviar que se ha eliminado exitosamente
         JSONObject json = new JSONObject();
-        json.put("message", "Tipo de contratación eliminado exitosamente");
+        json.put("message", "Empleado eliminado exitosamente");
         response.getWriter().println(json);
     }
 
@@ -140,9 +141,9 @@ public class TipoContratacionController extends HttpServlet {
             JSONObject bodyJSON = new JSONObject(requestData);
             //Se obtiene la acción que se ejecutará
             String action = bodyJSON.getString("action");
-            //Se obtiene el JSON a utilizar y luego lo transforma al objeto TipoContratacion
+            //Se obtiene el JSON a utilizar y luego lo transforma al objeto Empleado
             String jsonString = bodyJSON.getJSONObject("json").toString();
-            TipoContratacion object = gson.fromJson(jsonString, TipoContratacion.class);
+            Empleado object = gson.fromJson(jsonString, Empleado.class);
             /*
                 Si la acción es nula, tirará el error de que no sé específico la acción
              */
@@ -167,11 +168,11 @@ public class TipoContratacionController extends HttpServlet {
         //Obtiene los parámetros de la URL
         String pathInfo = request.getPathInfo();
         /*
-            Si no existe algún parámetro llama a la función para obtener todos los tipos de contratación,
-            sino, se llama la función para obtener el tipo de contratación por ID
+            Si no existe algún parámetro llama a la función para obtener todos los empleados,
+            sino, se llama la función para obtener el Empleado por ID
          */
         if (pathInfo == null || pathInfo.equals("/")) {
-            listTipoContratacion(response);
+            listEmpleados(response);
         } else {
             /*
                 Se realiza un try para verificara que lo que trae el parámetro sea un número,
@@ -180,8 +181,8 @@ public class TipoContratacionController extends HttpServlet {
             try {
                 //Se llama la función extractIdFromPathInfo para obtener el ID
                 Integer id = extractIdFromPathInfo(pathInfo);
-                //Se llama la función para obtener el tipo de contratación
-                getTipoContratacionById(id, response);
+                //Se llama la función para obtener el Empleado
+                getEmpleadoById(id, response);
             } catch (NumberFormatException e) {
                 response.sendError(HttpServletResponse.SC_BAD_REQUEST, "ID inválido");
             }
@@ -190,21 +191,21 @@ public class TipoContratacionController extends HttpServlet {
 
 
     //Función que procesa una petición POST
-    private void processPostRequest(String action, TipoContratacion object, HttpServletResponse response)
+    private void processPostRequest(String action, Empleado object, HttpServletResponse response)
             throws IOException {
 
-        //Se obtiene el ID del tipo de contratación
-        int id = object.getIdTipoContratacion();
+        //Se obtiene el ID del Empleado
+        int id = object.getIdEmpleado();
 
         /*
             Se realiza un switch con la acción que se realizará,
-            si la acción es "insertar", se llamará la función para añadir el tipo de contratación,
-            si la acción es "actualizar", se llamará la función para actualizar el tipo de contratación,
-            si la acción es "eliminar", se llamará la función para eliminar el tipo de contratación,
+            si la acción es "insertar", se llamará la función para añadir el Empleado,
+            si la acción es "actualizar", se llamará la función para actualizar el Empleado,
+            si la acción es "eliminar", se llamará la función para eliminar el Empleado,
             y si no obtiene alguno de los datos anteriores, tirará error de que es una acción desconocida
          */
         switch (action) {
-            case "insertar" -> insertTipoContratacion(object, response);
+            case "insertar" -> insertEmpleado(object, response);
             case "actualizar" -> {
                 /*
                     Verifica que el ID sea cero,
@@ -214,7 +215,7 @@ public class TipoContratacionController extends HttpServlet {
                     response.sendError(HttpServletResponse.SC_BAD_REQUEST, "ID no proporcionado para actualizar");
                     return;
                 }
-                updateTipoContratacion(object, response);
+                updateEmpleado(object, response);
             }
             case "eliminar" -> {
                 /*
@@ -225,7 +226,7 @@ public class TipoContratacionController extends HttpServlet {
                     response.sendError(HttpServletResponse.SC_BAD_REQUEST, "ID no proporcionado para eliminar");
                     return;
                 }
-                deleteTipoContratacion(id, response);
+                deleteEmpleado(id, response);
             }
             default -> response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Acción desconocida");
         }

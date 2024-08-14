@@ -13,6 +13,14 @@
         <servlet-name>TipoContratacionController</servlet-name>
         <url-pattern>/tipoContrataciones/*</url-pattern>
     </servlet-mapping>
+    <servlet>
+        <servlet-name>EmpleadoController</servlet-name>
+        <servlet-class>com.udb.dwf.rrhh.controllers.EmpleadoController</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>EmpleadoController</servlet-name>
+        <url-pattern>/empleados</url-pattern>
+    </servlet-mapping>
 
     <welcome-file-list>
         <welcome-file>index.jsp</welcome-file>
