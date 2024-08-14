@@ -21,7 +21,6 @@ public class TipoContratacionController extends HttpServlet {
     //Creador GSON para crear objetos desde un JSON
     Gson gson = new GsonBuilder().create();
 
-
     //Instancia de la Clase de Servicios de la Tabla TipoContratacion
     private final TipoContratacionesServices services = new TipoContratacionesServices();
 
@@ -195,7 +194,6 @@ public class TipoContratacionController extends HttpServlet {
 
         //Se obtiene el ID del tipo de contratación
         int id = object.getIdTipoContratacion();
-
         /*
             Se realiza un switch con la acción que se realizará,
             si la acción es "insertar", se llamará la función para añadir el tipo de contratación,

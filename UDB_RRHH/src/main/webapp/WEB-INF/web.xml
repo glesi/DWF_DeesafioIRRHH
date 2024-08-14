@@ -14,12 +14,36 @@
         <url-pattern>/tipoContrataciones/*</url-pattern>
     </servlet-mapping>
     <servlet>
-        <servlet-name>EmpleadoController</servlet-name>
-        <servlet-class>com.udb.dwf.rrhh.controllers.EmpleadoController</servlet-class>
+        <servlet-name>EmpleadosController</servlet-name>
+        <servlet-class>com.udb.dwf.rrhh.controllers.EmpleadosController</servlet-class>
     </servlet>
     <servlet-mapping>
-        <servlet-name>EmpleadoController</servlet-name>
+        <servlet-name>EmpleadosController</servlet-name>
         <url-pattern>/empleados</url-pattern>
+    </servlet-mapping>
+    <servlet>
+        <servlet-name>CargoController</servlet-name>
+        <servlet-class>com.udb.dwf.rrhh.controllers.CargoController</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>CargoController</servlet-name>
+        <url-pattern>/cargos</url-pattern>
+    </servlet-mapping>
+    <servlet>
+        <servlet-name>ContratacionesController</servlet-name>
+        <servlet-class>com.udb.dwf.rrhh.controllers.ContratacionesController</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>ContratacionesController</servlet-name>
+        <url-pattern>/contrataciones</url-pattern>
+    </servlet-mapping>
+    <servlet>
+        <servlet-name>ViewController</servlet-name>
+        <servlet-class>com.udb.dwf.rrhh.controllers.ViewController</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>ViewController</servlet-name>
+        <url-pattern>/vista</url-pattern>
     </servlet-mapping>
 
     <welcome-file-list>
