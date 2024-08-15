@@ -14,36 +14,37 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.List;
-
+// Anotación que define este Servlet con el nombre "DepartamentoController"
 @WebServlet(name = "DepartamentoController", urlPatterns = "/departamento/*")
+// Clase que utilizaremos para manejar solicitudes HTTP en la aplicación
 public class DepartamentoController extends HttpServlet {
-
+    // Instancia de la clase DepartamentoServices para interactuar con la lógica de negocio
     private final DepartamentoServices departamentoServices = new DepartamentoServices();
-
+    // Método que maneja solicitudes GET
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         processRequest(request, response);
     }
-
+    // Método que maneja solicitudes POST
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         processRequest(request, response);
     }
-
+    // Método que maneja solicitudes OPTIONS
     @Override
     protected void doOptions(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         setAccessControlHeaders(response);
         response.setStatus(HttpServletResponse.SC_OK);
     }
-
+    // Método común para procesar tanto solicitudes GET como POST
     protected void processRequest(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         response.setHeader("Access-Control-Allow-Origin", "*");
         response.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
         response.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
-
+    // Obtiene el método HTTP de la solicitud
         String method = request.getMethod();
         String action = request.getParameter("accion");
-
+    // Verifica si el método es POST
         if ("POST".equals(method)) {
             if (action == null) {
                 response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Acción no especificada");
@@ -56,11 +57,15 @@ public class DepartamentoController extends HttpServlet {
             response.sendError(HttpServletResponse.SC_NOT_IMPLEMENTED, "Método no implementado");
         }
     }
-
+    // Método para procesar solicitudes POST
     private void processPostRequest(String action, HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String pathInfo = request.getPathInfo();
 
-        Integer id = extractIdFromPathInfo(pathInfo);
+        Integer id = null;
+
+        if (!"insertar".equalsIgnoreCase(action)) {
+            id = extractIdFromPathInfo(pathInfo);
+        }
 
         switch (action) {
             case "insertar":
@@ -84,7 +89,7 @@ public class DepartamentoController extends HttpServlet {
                 response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Acción desconocida");
         }
     }
-
+    // Método para procesar solicitudes GET
     private void processGetRequest(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String pathInfo = request.getPathInfo();
         if (pathInfo == null || pathInfo.equals("/")) {
@@ -98,7 +103,7 @@ public class DepartamentoController extends HttpServlet {
             }
         }
     }
-
+    // Método que extrae el ID de la información de la ruta en la URL
     private Integer extractIdFromPathInfo(String pathInfo) throws ServletException {
         if (pathInfo == null || pathInfo.equals("/")) {
             throw new ServletException("Ruta inválida.");
@@ -109,7 +114,7 @@ public class DepartamentoController extends HttpServlet {
             throw new ServletException("ID inválido");
         }
     }
-
+    // Método que lista todos los departamentos y los envía en formato JSON como respuesta
     private void listDepartamentos(HttpServletResponse response) throws IOException {
         List<Departamento> listaDepartamentos = departamentoServices.obtenerDepartamentos();
         JSONArray json = new JSONArray(listaDepartamentos);
@@ -119,7 +124,7 @@ public class DepartamentoController extends HttpServlet {
         out.println(json);
         out.flush();
     }
-
+    // Método que obtiene un departamento por su ID y lo envía en formato JSON como respuesta
     private void getDepartamentoById(Integer id, HttpServletResponse response) throws IOException {
         Departamento departamento = departamentoServices.obtenerDepartamento(id);
         if (departamento != null) {
@@ -132,7 +137,7 @@ public class DepartamentoController extends HttpServlet {
             response.sendError(HttpServletResponse.SC_NOT_FOUND, "Departamento no encontrado");
         }
     }
-
+    // Método que inserta un nuevo departamento
     private void insertDepartamento(HttpServletRequest request, HttpServletResponse response) throws IOException {
         StringBuilder buffer = new StringBuilder();
         BufferedReader reader = request.getReader();
@@ -156,7 +161,7 @@ public class DepartamentoController extends HttpServlet {
         response.setCharacterEncoding("UTF-8");
         response.getWriter().write("{\"message\": \"Departamento creado exitosamente\"}");
     }
-
+    // Método que actualiza un departamento existente
     private void updateDepartamento(int id, HttpServletRequest request, HttpServletResponse response) throws IOException {
         StringBuilder buffer = new StringBuilder();
         BufferedReader reader = request.getReader();
@@ -181,14 +186,14 @@ public class DepartamentoController extends HttpServlet {
         response.setCharacterEncoding("UTF-8");
         response.getWriter().write("{\"message\": \"Departamento actualizado exitosamente\"}");
     }
-
+    // Método que elimina un departamento existente
     private void deleteDepartamento(int id, HttpServletRequest request, HttpServletResponse response) throws IOException {
         departamentoServices.eliminarDepartamento(id);
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
         response.getWriter().write("{\"message\": \"Departamento eliminado exitosamente\"}");
     }
-
+    // Método que configura los encabezados CORS para permitir solicitudes desde cualquier origen
     private void setAccessControlHeaders(HttpServletResponse response) {
         response.setHeader("Access-Control-Allow-Origin", "*");
         response.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");

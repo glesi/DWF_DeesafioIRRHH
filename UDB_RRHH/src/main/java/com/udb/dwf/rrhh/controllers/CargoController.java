@@ -15,34 +15,181 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.List;
 
-//Servlet que maneja el CRUD de la Tabla TipoContratacion
-@WebServlet(name = "CargoController", urlPatterns = "/cargos/*")
+@WebServlet(name = "CargoController", urlPatterns = {"/cargo/*"})
 public class CargoController extends HttpServlet {
-
-    private final CargosServices cargosServices = new CargosServices();
+    // Instancia del servicio para gestionar las operaciones relacionadas con 'Cargo'
+    private final CargosServices cargoService = new CargosServices();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        // Llama al método 'processRequest' para manejar las solicitudes GET
         processRequest(request, response);
     }
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        // Llama al método 'processRequest' para manejar las solicitudes POST
         processRequest(request, response);
     }
 
-    @Override
-    protected void doPut(HttpServletRequest request, HttpServletResponse response)
+    protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        processRequest(request, response);
+        response.setHeader("Access-Control-Allow-Origin", "*");
+        response.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+        response.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
+
+        // Obtiene el método HTTP de la solicitud (GET, POST, etc.)
+        String method = request.getMethod();
+        String action = request.getParameter("accion");
+
+        // Verifica el método HTTP y procesa la solicitud en consecuencia
+        if ("POST".equals(method)) {
+            if (action == null) {
+                response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Acción no especificada");
+                return;
+            }
+            processPostRequest(action, request, response);
+        } else if ("GET".equals(method)) {
+            processGetRequest(request, response);
+        } else {
+            response.sendError(HttpServletResponse.SC_NOT_IMPLEMENTED, "Método no implementado");
+        }
     }
 
-    @Override
-    protected void doDelete(HttpServletRequest request, HttpServletResponse response)
+    private Integer extractIdFromPathInfo(String pathInfo) throws ServletException {
+        if (pathInfo == null || pathInfo.equals("/")) {
+            throw new ServletException("Ruta inválida.");
+        }
+        try {
+            return Integer.parseInt(pathInfo.substring(1));  // Extrae el ID de la URL
+        } catch (NumberFormatException e) {
+            throw new ServletException("ID inválido");
+        }
+    }
+
+    private void processPostRequest(String action, HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        processRequest(request, response);
+        String pathInfo = request.getPathInfo();
+
+        Integer id = null;
+
+        if (!"insertar".equalsIgnoreCase(action)) {
+            id = extractIdFromPathInfo(pathInfo);
+        }
+
+        switch (action) {
+            case "insertar":
+                insertCargo(request, response);
+                break;
+            case "actualizar":
+                updateCargo(id, request, response);
+                break;
+            case "eliminar":
+                if (id == null) {
+                    response.sendError(HttpServletResponse.SC_BAD_REQUEST, "ID no proporcionado para eliminar");
+                    return;
+                }
+                deleteCargo(id, request, response);
+                break;
+            default:
+                response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Acción desconocida");
+        }
+    }
+
+    private void processGetRequest(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        String pathInfo = request.getPathInfo();
+        if (pathInfo == null || pathInfo.equals("/")) {
+            listCargo(response);
+        } else {
+            try {
+                Integer id = extractIdFromPathInfo(pathInfo);
+                getCargoById(id, response);
+            } catch (NumberFormatException e) {
+                response.sendError(HttpServletResponse.SC_BAD_REQUEST, "ID inválido");
+            }
+        }
+    }
+
+    private void getCargoById(Integer id, HttpServletResponse response)
+            throws IOException {
+        Cargo cargo = cargoService.obtenerCargoPorId(id);
+        if (cargo != null) {
+            PrintWriter out = response.getWriter();
+            response.setContentType("application/json");
+            response.setCharacterEncoding("UTF-8");
+            out.println(new JSONObject(cargo));
+            out.flush();
+        } else {
+            response.sendError(HttpServletResponse.SC_NOT_FOUND, "Cargo no encontrado");
+        }
+    }
+
+    private void listCargo(HttpServletResponse response)
+            throws IOException {
+        List<Cargo> cargoList = cargoService.obtenerCargos();
+        JSONArray json = new JSONArray(cargoList);
+        PrintWriter out = response.getWriter();
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+        out.println(json);
+        out.flush();
+    }
+
+    private void insertCargo(HttpServletRequest request, HttpServletResponse response)
+            throws IOException {
+        StringBuilder buffer = new StringBuilder();
+        BufferedReader reader = request.getReader();
+        String line;
+        while ((line = reader.readLine()) != null) {
+            buffer.append(line);
+        }
+        String data = buffer.toString();
+
+        JSONObject jsonObject = new JSONObject(data);
+        String cargoStr = jsonObject.getString("cargo");
+        String descripcionCargoStr = jsonObject.getString("descripcionCargo");
+        boolean jefatura = jsonObject.getBoolean("jefatura");
+
+        Cargo newCargo = new Cargo(0, cargoStr, descripcionCargoStr, jefatura);
+        cargoService.crearCargo(newCargo);
+
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+        response.getWriter().write("{\"message\": \"Cargo creado exitosamente\"}");
+    }
+
+    private void updateCargo(int id, HttpServletRequest request, HttpServletResponse response)
+            throws IOException {
+        StringBuilder buffer = new StringBuilder();
+        BufferedReader reader = request.getReader();
+        String line;
+        while ((line = reader.readLine()) != null) {
+            buffer.append(line);
+        }
+        String data = buffer.toString();
+
+        JSONObject jsonObject = new JSONObject(data);
+        String cargoStr = jsonObject.getString("cargo");
+        String descripcionCargoStr = jsonObject.getString("descripcionCargo");
+        boolean jefatura = jsonObject.getBoolean("jefatura");
+
+        Cargo cargo = new Cargo(id, cargoStr, descripcionCargoStr, jefatura);
+        cargoService.actualizarCargo(cargo);
+
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+        response.getWriter().write("{\"message\": \"Cargo actualizado exitosamente\"}");
+    }
+
+    private void deleteCargo(int id, HttpServletRequest request, HttpServletResponse response)
+            throws IOException {
+        cargoService.eliminarCargo(id);
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+        response.getWriter().write("{\"message\": \"Cargo eliminado exitosamente\"}");
     }
 
     @Override
@@ -50,141 +197,6 @@ public class CargoController extends HttpServlet {
             throws ServletException, IOException {
         setAccessControlHeaders(response);
         response.setStatus(HttpServletResponse.SC_OK);
-    }
-
-    protected void processRequest(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        setAccessControlHeaders(response);
-
-        String method = request.getMethod();
-        String pathInfo = request.getPathInfo();
-
-        if ("/".equals(pathInfo)) pathInfo = null;
-
-        try {
-            switch (method) {
-                case "GET":
-                    if (pathInfo == null) {
-                        listCargos(response);
-                    } else {
-                        int idCargo = extractIdFromPathInfo(pathInfo);
-                        getCargoById(idCargo, response);
-                    }
-                    break;
-                case "POST":
-                    if (pathInfo == null) {
-                        createCargo(request, response);
-                    } else {
-                        response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Operación POST no soportada en la URL especificada");
-                    }
-                    break;
-                case "PUT":
-                    if (pathInfo != null) {
-                        int idCargo = extractIdFromPathInfo(pathInfo);
-                        updateCargo(idCargo, request, response);
-                    } else {
-                        response.sendError(HttpServletResponse.SC_BAD_REQUEST, "URL debe incluir ID del cargo a actualizar");
-                    }
-                    break;
-                case "DELETE":
-                    if (pathInfo != null) {
-                        int idCargo = extractIdFromPathInfo(pathInfo);
-                        deleteCargo(idCargo, response);
-                    } else {
-                        response.sendError(HttpServletResponse.SC_BAD_REQUEST, "URL debe incluir ID del cargo a eliminar");
-                    }
-                    break;
-                default:
-                    response.sendError(HttpServletResponse.SC_NOT_IMPLEMENTED, "Método no implementado");
-            }
-        } catch (NumberFormatException e) {
-            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "ID inválido");
-        }
-    }
-
-    private int extractIdFromPathInfo(String pathInfo) {
-        return Integer.parseInt(pathInfo.substring(1)); // Extrae el ID de la URL
-    }
-
-    private void listCargos(HttpServletResponse response) throws IOException {
-        List<Cargo> cargos = cargosServices.obtenerCargos();
-        JSONArray jsonArray = new JSONArray(cargos);
-        sendJsonArrayResponse(response, jsonArray);
-    }
-
-    private void getCargoById(int idCargo, HttpServletResponse response) throws IOException {
-        Cargo cargo = cargosServices.obtenerCargoPorId(idCargo);
-        if (cargo != null) {
-            sendJsonResponse(response, new JSONObject(cargo));
-        } else {
-            response.sendError(HttpServletResponse.SC_NOT_FOUND, "Cargo no encontrado");
-        }
-    }
-
-    private void createCargo(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        JSONObject jsonObject = parseJsonRequest(request);
-        Cargo cargo = new Cargo(
-                0,
-                jsonObject.getString("cargo"),
-                jsonObject.getString("descripcionCargo"),
-                jsonObject.getBoolean("jefatura")
-        );
-        Cargo createdCargo = cargosServices.crearCargo(cargo);
-        if (createdCargo != null) {
-            sendJsonResponse(response, new JSONObject(createdCargo));
-        } else {
-            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "No se pudo crear el cargo");
-        }
-    }
-
-    private void updateCargo(int idCargo, HttpServletRequest request, HttpServletResponse response) throws IOException {
-        JSONObject jsonObject = parseJsonRequest(request);
-        Cargo cargo = new Cargo(
-                idCargo,
-                jsonObject.getString("cargo"),
-                jsonObject.getString("descripcionCargo"),
-                jsonObject.getBoolean("jefatura")
-        );
-        boolean updated = cargosServices.actualizarCargo(cargo);
-        if (updated) {
-            sendJsonResponse(response, new JSONObject(cargo));
-        } else {
-            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "No se pudo actualizar el cargo");
-        }
-    }
-
-    private void deleteCargo(int idCargo, HttpServletResponse response) throws IOException {
-        boolean deleted = cargosServices.eliminarCargo(idCargo);
-        if (deleted) {
-            response.setStatus(HttpServletResponse.SC_NO_CONTENT);
-        } else {
-            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "No se pudo eliminar el cargo");
-        }
-    }
-
-    private JSONObject parseJsonRequest(HttpServletRequest request) throws IOException {
-        StringBuilder buffer = new StringBuilder();
-        BufferedReader reader = request.getReader();
-        String line;
-        while ((line = reader.readLine()) != null) {
-            buffer.append(line);
-        }
-        return new JSONObject(buffer.toString());
-    }
-
-    private void sendJsonResponse(HttpServletResponse response, JSONObject jsonObject) throws IOException {
-        response.setContentType("application/json");
-        response.setCharacterEncoding("UTF-8");
-        PrintWriter out = response.getWriter();
-        out.print(jsonObject.toString());
-        out.flush();
-    }
-
-    private void sendJsonArrayResponse(HttpServletResponse response, JSONArray jsonArray) throws IOException {
-        response.setContentType("application/json");
-        response.setCharacterEncoding("UTF-8");
-        PrintWriter out = response.getWriter();
-        out.print(jsonArray.toString());
-        out.flush();
     }
 
     private void setAccessControlHeaders(HttpServletResponse response) {

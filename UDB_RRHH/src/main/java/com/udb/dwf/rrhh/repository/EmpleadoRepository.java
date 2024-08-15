@@ -12,15 +12,16 @@ import java.util.List;
 
 public class EmpleadoRepository {
 
-    //create
+    // Metodo para crear empleado
     public Empleado crearEmpleado(Empleado empleado) {
         Connection connection = null;
         PreparedStatement preparedStatement = null;
         ResultSet generatedKeys = null;
 
+        // Maneja cualquier error de la base de datos
         try {
             connection = Conexion.getConexion();
-            String query = "INSERT INTO Empleado (numeroDui,nombrePersona,usuario,numeroTelefono,correoInstitucional,fechaNacimiento) VALUES (?,?,?,?,?,?)";
+            String query = "INSERT INTO Empleados (numeroDui,nombrePersona,usuario,numeroTelefono,correoInstitucional,fechaNacimiento) VALUES (?,?,?,?,?,?)";
             preparedStatement = connection.prepareStatement(query, PreparedStatement.RETURN_GENERATED_KEYS);
             preparedStatement.setString(1, empleado.getNumeroDui());
             preparedStatement.setString(2, empleado.getNombrePersona());
@@ -53,17 +54,17 @@ public class EmpleadoRepository {
     }
 
 
-    //read
+    //Metodo listar empleados
     public List<Empleado> obtenerEmpleado(){
         List<Empleado> empleadoList = new ArrayList<Empleado>();
 
         Connection connection= null;
         PreparedStatement preparedStatement=  null;
         ResultSet resultSet= null;
-
+        // Maneja cualquier error de la base de datos
         try{
             connection= Conexion.getConexion();
-            String query= "SELECT idEmpleado, numeroDui,nombrePersona,usuario,numeroTelefono,correoInstitucional,fechaNacimiento FROM Empleado";
+            String query= "SELECT idEmpleado, numeroDui,nombrePersona,usuario,numeroTelefono,correoInstitucional,fechaNacimiento FROM Empleados";
             preparedStatement= connection.prepareStatement(query);
             resultSet = preparedStatement.executeQuery();
 
@@ -98,10 +99,10 @@ public class EmpleadoRepository {
     public boolean actualizarEmpleado(Empleado empleado) {
         Connection connection = null;
         PreparedStatement preparedStatement = null;
-
+        // Maneja cualquier error de la base de datos
         try {
             connection = Conexion.getConexion();
-            String query = "UPDATE  SET idEmpleado, numeroDui,nombrePersona,usuario,numeroTelefono,correoInstitucional,fechaNacimiento = ?, WHERE idepartamento = ?";
+            String query = "UPDATE Empleados SET idEmpleado = ?, numeroDui = ?, nombrePersona = ?, usuario = ?, numeroTelefono = ?,correoInstitucional = ?, fechaNacimiento = ? WHERE idEmpleado = ?";
             preparedStatement = connection.prepareStatement(query);
             preparedStatement.setInt(1, empleado.getIdEmpleado());
             preparedStatement.setString(2, empleado.getNumeroDui());
@@ -126,15 +127,14 @@ public class EmpleadoRepository {
         }
     }
 
-
     // Metodo para eliminar Empleado
     public boolean eliminarEmpleado(int idEmpleado) {
         Connection connection = null;
         PreparedStatement preparedStatement = null;
-
+        // Maneja cualquier error de la base de datos
         try {
             connection = Conexion.getConexion();
-            String query = "DELETE FROM Empleado WHERE idEmpleado = ?";
+            String query = "DELETE FROM Empleados WHERE idEmpleado = ?";
             preparedStatement = connection.prepareStatement(query);
             preparedStatement.setInt(1, idEmpleado);
 
@@ -158,10 +158,10 @@ public class EmpleadoRepository {
         Connection connection = null;
         PreparedStatement preparedStatement = null;
         ResultSet resultSet = null;
-
+        // Maneja cualquier error de la base de datos
         try {
             connection = Conexion.getConexion();
-            String query = "SELECT idEmpleado, numeroDui,nombrePersona,usuario,numeroTelefono,correoInstitucional,fechaNacimiento FROM Empleado WHERE idEmpleado = ?";
+            String query = "SELECT idEmpleado, numeroDui,nombrePersona,usuario,numeroTelefono,correoInstitucional,fechaNacimiento FROM Empleados WHERE idEmpleado = ?";
             preparedStatement = connection.prepareStatement(query);
             preparedStatement.setInt(1, idEmpleado);
             resultSet = preparedStatement.executeQuery();

@@ -1,58 +1,54 @@
 package com.udb.dwf.rrhh.controllers;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.udb.dwf.rrhh.pojos.TipoContratacion;
 import com.udb.dwf.rrhh.services.TipoContratacionesServices;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.json.JSONArray;
 import org.json.JSONObject;
+
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.List;
-import java.util.stream.Collectors;
 
-//Servlet que maneja el CRUD de la Tabla TipoContratacion
+@WebServlet(name = "TipoContratacionController", urlPatterns = {"/tipo-contratacion/*"})
 public class TipoContratacionController extends HttpServlet {
-
-    Gson gson = new GsonBuilder().create();
-
-
-    //Instancia de la Clase de Servicios de la Tabla TipoContratacion
+    // Se instancia el servicio para gestionar las operaciones relacionadas con 'TipoContratacion'
     private final TipoContratacionesServices tipoContratacionService = new TipoContratacionesServices();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        // Llama al método 'processRequest' para manejar las solicitudes GET
         processRequest(request, response);
     }
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        // Llama al método 'processRequest' para manejar las solicitudes POST
         processRequest(request, response);
     }
 
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setHeader("Access-Control-Allow-Origin", "*");
-        response.setHeader("Access-Control-Allow-Methods", "*");
-        response.setHeader("Access-Control-Allow-Headers", "*");
-        String method = request.getMethod(); // Parámetro de consulta para la acción
-        String requestData = request.getReader().lines().collect(Collectors.joining());
-        JSONObject bodyJSON = new JSONObject(requestData);
-        String action = bodyJSON.getString("action");
-        String jsonString = bodyJSON.getJSONObject("json").toString();
-        TipoContratacion object = gson.fromJson(jsonString, TipoContratacion.class);
+        response.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+        response.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
+     // Obtiene el método HTTP de la solicitud (GET, POST, etc.)
+        String method = request.getMethod();
+        String action = request.getParameter("accion");
+     //Verifica el método HTTP y procesa la solicitud en consecuencia
         if ("POST".equals(method)) {
             if (action == null) {
                 response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Accion no especificada");
                 return;
             }
-            processPostRequest(action, object, request, response);
+            processPostRequest(action, request, response);
         } else if ("GET".equals(method)) {
             processGetRequest(request, response);
         } else {
@@ -71,28 +67,36 @@ public class TipoContratacionController extends HttpServlet {
         }
     }
 
-    private void processPostRequest(String action, TipoContratacion object, HttpServletRequest request, HttpServletResponse response)
-            throws IOException {
+    private void processPostRequest(String action, HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        String pathInfo = request.getPathInfo();
 
-        int id = object.getIdTipoContratacion();
+        Integer id = null;
+
+        if (!"insertar".equalsIgnoreCase(action)) {
+            id = extractIdFromPathInfo(pathInfo);
+        }
 
         switch (action) {
-            case "insertar" -> insertTipoContratacion(object, response);
-            case "actualizar" -> {
-                if (id == 0) {
+            case "insertar":
+                insertTipoContratacion(request, response);
+                break;
+            case "actualizar":
+                if (id == null) {
                     response.sendError(HttpServletResponse.SC_BAD_REQUEST, "ID no proporcionado para actualizar");
                     return;
                 }
-                updateTipoContratacion(object, response);
-            }
-            case "eliminar" -> {
-                if (id == 0) {
+                updateTipoContratacion(id, request, response);
+                break;
+            case "eliminar":
+                if (id == null) {
                     response.sendError(HttpServletResponse.SC_BAD_REQUEST, "ID no proporcionado para eliminar");
                     return;
                 }
-                deleteTipoContratacion(id, response);
-            }
-            default -> response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Accion desconocida");
+                deleteTipoContratacion(id, request, response);
+                break;
+            default:
+                response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Accion desconocida");
         }
     }
 
@@ -125,51 +129,70 @@ public class TipoContratacionController extends HttpServlet {
         }
     }
 
-
-    //Función que manda la lista de los tipos de contratación
     private void listTipoContratacion(HttpServletResponse response)
             throws IOException {
-        //De la instancia de la Clase de Servicios, obtenemos los tipos de contratación
         List<TipoContratacion> tipoContratacionList = tipoContratacionService.obtenerTodosTipoContratacion();
-        //Pasamos la lista de los tipos de contratación a un objeto JSONArray
         JSONArray json = new JSONArray(tipoContratacionList);
-        //Obtenemos de la respuesta el escritor que nos ayudará a editar la respuesta
         PrintWriter out = response.getWriter();
-        //Configuramos la respuesta que el contenido sea "APLICATION/JSON" y que la codificación sea UTF-8
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
-        //Y finalizamos imprimiendo en la respuesta el JSON con la lista de los tipos de contratación
         out.println(json);
         out.flush();
     }
 
-    private void insertTipoContratacion(TipoContratacion object, HttpServletResponse response)
+    private void insertTipoContratacion(HttpServletRequest request, HttpServletResponse response)
             throws IOException {
-        TipoContratacion newTipoContratacion = new TipoContratacion(0, object.getTipoContratacion());
+        StringBuilder buffer = new StringBuilder();
+        BufferedReader reader = request.getReader();
+        String line;
+        while ((line = reader.readLine()) != null) {
+            buffer.append(line);
+        }
+        String data = buffer.toString();
+
+        JSONObject jsonObject = new JSONObject(data);
+        String tipoContratacionStr = jsonObject.getString("tipoContratacion");
+
+        TipoContratacion newTipoContratacion = new TipoContratacion(0, tipoContratacionStr);
         tipoContratacionService.crearTipoContratacion(newTipoContratacion);
-        JSONObject json = new JSONObject();
-        json.put("message", "Tipo de contratación creado exitosamente");
-        response.getWriter().println(json);
+
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+        response.getWriter().write("{\"message\": \"Tipo de contratación creado exitosamente\"}");
     }
 
-    private void updateTipoContratacion(TipoContratacion object, HttpServletResponse response)
+    private void updateTipoContratacion(int id, HttpServletRequest request, HttpServletResponse response)
             throws IOException {
-        tipoContratacionService.actualizarTipoContratacion(object);
-        JSONObject json = new JSONObject();
-        json.put("message", "Tipo de contratación actualizado exitosamente");
-        response.getWriter().println(json);
+        StringBuilder buffer = new StringBuilder();
+        BufferedReader reader = request.getReader();
+        String line;
+        while ((line = reader.readLine()) != null) {
+            buffer.append(line);
+        }
+        String data = buffer.toString();
+
+        JSONObject jsonObject = new JSONObject(data);
+        String tipoContratacionStr = jsonObject.getString("tipoContratacion");
+
+        TipoContratacion tipoContratacion = new TipoContratacion(id, tipoContratacionStr);
+        tipoContratacionService.actualizarTipoContratacion(tipoContratacion);
+
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+        response.getWriter().write("{\"message\": \"Tipo de contratación actualizado exitosamente\"}");
     }
 
-    private void deleteTipoContratacion(int id, HttpServletResponse response)
+    private void deleteTipoContratacion(int id, HttpServletRequest request, HttpServletResponse response)
             throws IOException {
         tipoContratacionService.eliminarTipoContratacion(id);
-        JSONObject json = new JSONObject();
-        json.put("message", "Tipo de contratación eliminado exitosamente");
-        response.getWriter().println(json);
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+        response.getWriter().write("{\"message\": \"Tipo de contratación eliminado exitosamente\"}");
     }
 
     @Override
-    protected void doOptions(HttpServletRequest request, HttpServletResponse response) {
+    protected void doOptions(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
         setAccessControlHeaders(response);
         response.setStatus(HttpServletResponse.SC_OK);
     }
@@ -177,7 +200,7 @@ public class TipoContratacionController extends HttpServlet {
     private void setAccessControlHeaders(HttpServletResponse response) {
         response.setHeader("Access-Control-Allow-Origin", "*");
         response.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
-        response.setHeader("Access-Control-Allow-Headers", "*");
+        response.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
         response.setHeader("Access-Control-Max-Age", "3600");
     }
 }

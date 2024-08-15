@@ -11,12 +11,13 @@ import java.util.List;
 
 public class TipoContratacionRepository {
 
-    //create
+    //Metodo para crear Tipo Contratacion
     public TipoContratacion crearTipoContratacion(TipoContratacion tipoContratacion) {
         Connection connection = null;
         PreparedStatement preparedStatement = null;
         ResultSet generatedKeys = null;
 
+        // Maneja cualquier error de la base de datos
         try {
             connection = Conexion.getConexion();
             String query = "INSERT INTO TipoContratacion (tipoContratacion) VALUES (?)";
@@ -42,18 +43,17 @@ public class TipoContratacionRepository {
                 System.err.println("Error al cerrar los recursos. Reason: " + e.getMessage());
             }
         }
-
         return tipoContratacion;
     }
 
-    //read
+    //Metodo para listar Tipo Contratacion
     public List<TipoContratacion> obtenerTipoContrataciones(){
         List<TipoContratacion> tipoContratacionList = new ArrayList<TipoContratacion>();
 
         Connection connection= null;
         PreparedStatement preparedStatement=  null;
         ResultSet resultSet= null;
-
+        // Maneja cualquier error de la base de datos
         try{
             connection= Conexion.getConexion();
             String query= "SELECT idTipoContratacion, tipoContratacion FROM TipoContratacion";
@@ -79,14 +79,13 @@ public class TipoContratacionRepository {
             }
         }
          return tipoContratacionList;
-
     }
 
-    //update
+    //Metodo para actualizar Tipo Contratacion
     public boolean actualizarTipoContratacion(TipoContratacion tipoContratacion) {
         Connection connection = null;
         PreparedStatement preparedStatement = null;
-
+        // Maneja cualquier error de la base de datos
         try {
             connection = Conexion.getConexion();
             String query = "UPDATE TipoContratacion SET tipoContratacion = ? WHERE idTipoContratacion = ?";
@@ -110,11 +109,11 @@ public class TipoContratacionRepository {
         }
     }
 
-    //delete
+    //Metodo para eliminar Tipo Contratacion
     public boolean eliminarTipoContratacion(int idTipoContratacion) {
         Connection connection = null;
         PreparedStatement preparedStatement = null;
-
+        // Maneja cualquier error de la base de datos
         try {
             connection = Conexion.getConexion();
             String query = "DELETE FROM TipoContratacion WHERE idTipoContratacion = ?";
@@ -142,7 +141,7 @@ public class TipoContratacionRepository {
         Connection connection = null;
         PreparedStatement preparedStatement = null;
         ResultSet resultSet = null;
-
+        // Maneja cualquier error de la base de datos
         try {
             connection = Conexion.getConexion();
             String query = "SELECT idTipoContratacion, tipoContratacion FROM TipoContratacion WHERE idTipoContratacion = ?";

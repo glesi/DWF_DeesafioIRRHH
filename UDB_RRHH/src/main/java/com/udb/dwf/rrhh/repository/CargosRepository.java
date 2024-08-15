@@ -16,7 +16,7 @@ public class CargosRepository {
         Connection connection = null;
         PreparedStatement preparedStatement = null;
         ResultSet generatedKeys = null;
-
+// Obtener la conexión a la base de datos
         try {
             connection = Conexion.getConexion();
             String query = "INSERT INTO cargos (cargo, descripcionCargo, jefatura) VALUES (?, ?, ?)";
@@ -87,7 +87,7 @@ public class CargosRepository {
     public boolean actualizarCargo(Cargo cargo) {
         Connection connection = null;
         PreparedStatement preparedStatement = null;
-
+// Obtener la conexión a la base de datos
         try {
             connection = Conexion.getConexion();
             String query = "UPDATE cargos SET cargo = ?, descripcionCargo = ?, jefatura = ? WHERE idCargo = ?";
@@ -115,7 +115,7 @@ public class CargosRepository {
     public boolean eliminarCargo(int idCargo) {
         Connection connection = null;
         PreparedStatement preparedStatement = null;
-
+// Obtener la conexión a la base de datos
         try {
             connection = Conexion.getConexion();
             String query = "DELETE FROM cargos WHERE idCargo = ?";
@@ -142,7 +142,7 @@ public class CargosRepository {
         Connection connection = null;
         PreparedStatement preparedStatement = null;
         ResultSet resultSet = null;
-
+// Obtener la conexión a la base de datos
         try {
             connection = Conexion.getConexion();
             String query = "SELECT idCargo, cargo, descripcionCargo, jefatura FROM cargos WHERE idCargo = ?";

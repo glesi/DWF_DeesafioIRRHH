@@ -47,8 +47,7 @@ public class DepartamentoRepository {
 
         return departamento;
     }
-
-    //read
+    //lista para almacenar los objetos Departamento que se obtendrán
     public List<Departamento> obtenerDepartamento(){
         List<Departamento> departamentoList = new ArrayList<Departamento>();
 
@@ -141,13 +140,14 @@ public class DepartamentoRepository {
             }
         }
     }
-
+    // Metodo para obtener departamento por Id
     public Departamento obtenerDepartamentoPorId(int idDepartamento) {
         Departamento departamento = null;
         Connection connection = null;
         PreparedStatement preparedStatement = null;
         ResultSet resultSet = null;
 
+        // Se maneja cualquier error que lanze la base de datos
         try {
             connection = Conexion.getConexion();
             String query = "SELECT idDepartamento,nombreDepartamento,descripcionDepartamento FROM Departamento WHERE idDepartamento = ?";
