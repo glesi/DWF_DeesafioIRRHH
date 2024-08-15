@@ -15,6 +15,14 @@ export class LandingPageComponent {
   ngOnInit(): void {
   }
 
+  object : any = {
+    'json': {
+      "idTipoContratacion": 3,
+      "tipoContratacion": "Medio Tiempo"
+    },
+    "accion": "insertar"
+  };
+
   getTipoContrataciones() {
     this.tipoContratacionService.get().subscribe({
       next: (result) => {
@@ -27,11 +35,7 @@ export class LandingPageComponent {
   }
 
   saveTipoContrataciones() {
-    //Agregar objeto
-    var object = {
-      "action": "insertar"
-    }
-    this.tipoContratacionService.post(object).subscribe({
+    this.tipoContratacionService.post(this.object).subscribe({
       next: (result) => {
         console.log(result)
       },
