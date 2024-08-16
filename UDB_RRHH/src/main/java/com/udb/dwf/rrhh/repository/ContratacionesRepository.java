@@ -13,19 +13,20 @@ public class ContratacionesRepository {
         Connection connection = null;
         PreparedStatement preparedStatement = null;
         ResultSet generatedKeys = null;
-
+// Obtener la conexión a la base de datos
         try {
             connection = Conexion.getConexion();
-            String query = "INSERT INTO Contrataciones (idDepartamento, idEmpleada, idCargo, idTipoContratacion, fechaContratacion, salario, estado) VALUES (?, ?, ?, ?, ?, ?, ?)";
+            String query = "INSERT INTO Contrataciones (idDepartamento, idEmpleado, idCargo, idTipoContratacion, fechaContratacion, salario, estado) VALUES (?, ?, ?, ?, ?, ?, ?)";
             preparedStatement = connection.prepareStatement(query, PreparedStatement.RETURN_GENERATED_KEYS);
             preparedStatement.setInt(1, contratacion.getIdDepartamento());
-            preparedStatement.setInt(2, contratacion.getIdEmpleada());
+            preparedStatement.setInt(2, contratacion.getIdEmpleado());
             preparedStatement.setInt(3, contratacion.getIdCargo());
             preparedStatement.setInt(4, contratacion.getIdTipoContratacion());
             preparedStatement.setDate(5, new java.sql.Date(contratacion.getFechaContratacion().getTime()));
             preparedStatement.setDouble(6, contratacion.getSalario());
             preparedStatement.setBoolean(7, contratacion.isEstado());
 
+            // Ejecutar la consulta y verificar si se afectaron filas
             int affectedRows = preparedStatement.executeUpdate();
             if (affectedRows > 0) {
                 generatedKeys = preparedStatement.getGeneratedKeys();
@@ -56,7 +57,7 @@ public class ContratacionesRepository {
         Connection connection = null;
         PreparedStatement preparedStatement = null;
         ResultSet resultSet = null;
-
+// Obtener la conexión a la base de datos
         try {
             connection = Conexion.getConexion();
             String query = "SELECT idContratacion, idDepartamento, idEmpleado, idCargo, idTipoContratacion, fechaContratacion, salario, estado FROM Contrataciones";
@@ -66,14 +67,14 @@ public class ContratacionesRepository {
             while (resultSet.next()) {
                 int idContratacion = resultSet.getInt("idContratacion");
                 int idDepartamento = resultSet.getInt("idDepartamento");
-                int idEmpleada = resultSet.getInt("idEmpleado");
+                int idEmpleado = resultSet.getInt("idEmpleado");
                 int idCargo = resultSet.getInt("idCargo");
                 int idTipoContratacion = resultSet.getInt("idTipoContratacion");
                 Date fechaContratacion = resultSet.getDate("fechaContratacion");
                 double salario = resultSet.getDouble("salario");
                 boolean estado = resultSet.getBoolean("estado");
 
-                Contrataciones contratacion = new Contrataciones(idContratacion, idDepartamento, idEmpleada, idCargo, idTipoContratacion, fechaContratacion, salario, estado);
+                Contrataciones contratacion = new Contrataciones(idContratacion, idDepartamento, idEmpleado, idCargo, idTipoContratacion, fechaContratacion, salario, estado);
                 contratacionesList.add(contratacion);
             }
 
@@ -96,13 +97,13 @@ public class ContratacionesRepository {
     public boolean actualizarContratacion(Contrataciones contratacion) {
         Connection connection = null;
         PreparedStatement preparedStatement = null;
-
+// Obtener la conexión a la base de datos
         try {
             connection = Conexion.getConexion();
-            String query = "UPDATE Contrataciones SET idDepartamento = ?, idEmpleada = ?, idCargo = ?, idTipoContratacion = ?, fechaContratacion = ?, salario = ?, estado = ? WHERE idContratacion = ?";
+            String query = "UPDATE Contrataciones SET idDepartamento = ?, idEmpleado = ?, idCargo = ?, idTipoContratacion = ?, fechaContratacion = ?, salario = ?, estado = ? WHERE idContratacion = ?";
             preparedStatement = connection.prepareStatement(query);
             preparedStatement.setInt(1, contratacion.getIdDepartamento());
-            preparedStatement.setInt(2, contratacion.getIdEmpleada());
+            preparedStatement.setInt(2, contratacion.getIdEmpleado());
             preparedStatement.setInt(3, contratacion.getIdCargo());
             preparedStatement.setInt(4, contratacion.getIdTipoContratacion());
             preparedStatement.setDate(5, new java.sql.Date(contratacion.getFechaContratacion().getTime()));
@@ -130,7 +131,7 @@ public class ContratacionesRepository {
     public boolean eliminarContratacion(int idContratacion) {
         Connection connection = null;
         PreparedStatement preparedStatement = null;
-
+// Obtener la conexión a la base de datos
         try {
             connection = Conexion.getConexion();
             String query = "DELETE FROM Contrataciones WHERE idContratacion = ?";
@@ -158,24 +159,24 @@ public class ContratacionesRepository {
         Connection connection = null;
         PreparedStatement preparedStatement = null;
         ResultSet resultSet = null;
-
+// Obtener la conexión a la base de datos
         try {
             connection = Conexion.getConexion();
-            String query = "SELECT idContratacion, idDepartamento, idEmpleada, idCargo, idTipoContratacion, fechaContratacion, salario, estado FROM Contrataciones WHERE idContratacion = ?";
+            String query = "SELECT idContratacion, idDepartamento, idEmpleado, idCargo, idTipoContratacion, fechaContratacion, salario, estado FROM Contrataciones WHERE idContratacion = ?";
             preparedStatement = connection.prepareStatement(query);
             preparedStatement.setInt(1, idContratacion);
             resultSet = preparedStatement.executeQuery();
 
             if (resultSet.next()) {
                 int idDepartamento = resultSet.getInt("idDepartamento");
-                int idEmpleada = resultSet.getInt("idEmpleada");
+                int idEmpleado = resultSet.getInt("idEmpleado");
                 int idCargo = resultSet.getInt("idCargo");
                 int idTipoContratacion = resultSet.getInt("idTipoContratacion");
                 Date fechaContratacion = resultSet.getDate("fechaContratacion");
                 double salario = resultSet.getDouble("salario");
                 boolean estado = resultSet.getBoolean("estado");
 
-                contratacion = new Contrataciones(idContratacion, idDepartamento, idEmpleada, idCargo, idTipoContratacion, fechaContratacion, salario, estado);
+                contratacion = new Contrataciones(idContratacion, idDepartamento, idEmpleado, idCargo, idTipoContratacion, fechaContratacion, salario, estado);
             }
         } catch (SQLException e) {
             System.err.println("Error al obtener el registro de Contratación por ID. Razón: " + e.getMessage());

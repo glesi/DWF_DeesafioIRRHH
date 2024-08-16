@@ -1,186 +1,127 @@
 package com.udb.dwf.rrhh.controllers;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.udb.dwf.rrhh.pojos.Contrataciones;
 import com.udb.dwf.rrhh.services.ContratacionesServices;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.List;
-import java.util.stream.Collectors;
 
 //Servlet que maneja el CRUD de la Tabla Contrataciones
+@WebServlet(name = "ContratacionesController", urlPatterns = {"/contrataciones/*"})
 public class ContratacionesController extends HttpServlet {
 
-    //Creador GSON para crear objetos desde un JSON
-    Gson gson = new GsonBuilder().create();
-
     //Instancia de la Clase de Servicios de la Tabla Contrataciones
-    private final ContratacionesServices services = new ContratacionesServices();
+    private final ContratacionesServices contratacionesService = new ContratacionesServices();
 
-    //Función que manda la lista de las contrataciones
-    private void listContrataciones(HttpServletResponse response)
-            throws IOException {
-        //De la instancia de la Clase de Servicios, obtenemos las contrataciones
-        List<Contrataciones> contrataciones = services.obtenerContrataciones();
-        //Pasamos la lista de las contrataciones a un objeto JSONArray
-        JSONArray json = new JSONArray(contrataciones);
-        //Obtenemos de la respuesta el writer que nos ayudará a editar la respuesta
-        PrintWriter out = response.getWriter();
-        //Configuramos la respuesta que el contenido sea "APPLICATION/JSON" y que la codificación sea UTF-8
-        response.setContentType("application/json");
-        response.setCharacterEncoding("UTF-8");
-        //Y finalizamos imprimiendo en la respuesta el JSON con la lista de las contrataciones
-        out.println(json);
-        out.flush();
-    }
-
-
-    //Función que extrae el ID del URL
-    private Integer extractIdFromPathInfo(String pathInfo) throws ServletException {
-        /*
-            Se identifica si el URL no contiene algún ID,
-            si no lo tiene, retorna nulo
-         */
-        if (pathInfo == null || pathInfo.equals("/")) {
-            throw new ServletException("Ruta invalida.");
-        }
-        /*
-            Realiza el cambio de string a Integer,
-            si no lo tiene, entonces da un NumberFormatException.
-         */
-        try {
-            return Integer.parseInt(pathInfo.substring(1));  // Extrae el ID de la URL
-        } catch (NumberFormatException e) {
-            throw new ServletException("ID inválido");
-        }
-    }
-
-    //Función que obtiene la contratación seleccionado por ID
-    private void getContratacionById(Integer id, HttpServletResponse response)
-            throws IOException {
-        /*
-            Se llama al servicio para obtener con el parámetro del ID al Contratación
-            que se necesita
-         */
-        Contrataciones contratacion = services.obtenerContratacionPorId(id);
-        /*
-            Verifica si la contratación es distinto de nulo,
-            si es distinto de nulo, se obtiene el writer de la respuesta para enviar
-            la contratación, si no,
-            envía un error con el mensaje que no se encontró la contratación deseada
-         */
-        if (contratacion != null) {
-            PrintWriter out = response.getWriter();
-            response.setContentType("application/json");
-            response.setCharacterEncoding("UTF-8");
-            out.println(new JSONObject(contratacion));
-            out.flush();
-        } else {
-            response.sendError(HttpServletResponse.SC_NOT_FOUND, "Contratación no encontrado");
-        }
-    }
-
-    //Función que añade una contratación nueva
-    private void insertContratacion(Contrataciones object, HttpServletResponse response)
-            throws IOException {
-        //Se llama al servicio con la función de crearContratacion enviando el objeto como parámetro
-        services.crearContratacion(object);
-        //Se crea el json del mensaje a enviar que se ha creado exitosamente
-        JSONObject json = new JSONObject();
-        json.put("message", "Contratación creada exitosamente");
-        response.getWriter().println(json);
-    }
-
-    //Función que actualiza una contratación agregado anteriormente
-    private void updateContratacion(Contrataciones object, HttpServletResponse response)
-            throws IOException {
-        //Se llama al servicio con la función de actualizarContratacion enviando el objeto como parámetro
-        services.actualizarContratacion(object);
-        //Se crea el json del mensaje a enviar que se ha actualizado exitosamente
-        JSONObject json = new JSONObject();
-        json.put("message", "Contratación actualizada exitosamente");
-        response.getWriter().println(json);
-    }
-
-    //Función que elimina una contratación
-    private void deleteContratacion(int id, HttpServletResponse response)
-            throws IOException {
-        //Se llama al servicio con la función de eliminarContratacion enviando el ID como parámetro
-        services.eliminarContratacion(id);
-        //Se crea el json del mensaje a enviar que se ha eliminado exitosamente
-        JSONObject json = new JSONObject();
-        json.put("message", "Contratación eliminada exitosamente");
-        response.getWriter().println(json);
-    }
-
-    //Función que procesa las peticiones en general
-    protected void processRequest(HttpServletRequest request, HttpServletResponse response)
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        //Se inserta los headers necesarios para evitar error CORS
-        setAccessControlHeaders(response);
-        //Se obtiene el método que se ocupará
+        try {
+            processRequest(request, response);
+        } catch (ParseException e) {
+            throw new RuntimeException(e);
+        }
+    }
+    // Método que maneja solicitudes POST
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        try {
+            processRequest(request, response);
+        } catch (ParseException e) {
+            throw new RuntimeException(e);
+        }
+    }
+    // Método común para procesar tanto solicitudes GET como POST
+    protected void processRequest(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException, ParseException {
+        response.setHeader("Access-Control-Allow-Origin", "*");
+        response.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+        response.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
+
         String method = request.getMethod();
-        /*
-            Verifica que método se ocupará, si es POST realizará el procedimiento para la petición POST,
-            si es GET, realizara el procedimiento para la petición GET,
-            si no, tirará error que no existe algún método implementado
-         */
+        String action = request.getParameter("accion");
+
         if ("POST".equals(method)) {
-            //Se obtiene los datos del Body
-            String requestData = request.getReader().lines().collect(Collectors.joining());
-            //Transforma el Body a JSON
-            JSONObject bodyJSON = new JSONObject(requestData);
-            //Se obtiene la acción que se ejecutará
-            String action = bodyJSON.getString("action");
-            //Se obtiene el JSON a utilizar y luego lo transforma al objeto Contratacion
-            String jsonString = bodyJSON.getJSONObject("json").toString();
-            Contrataciones object = gson.fromJson(jsonString, Contrataciones.class);
-            /*
-                Si la acción es nula, tirará el error de que no sé específico la acción
-             */
             if (action == null) {
-                response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Acción no especificada");
+                response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Accion no especificada");
                 return;
             }
-            //Se llama la función que realizará el procedimiento de la petición POST
-            processPostRequest(action, object, response);
+            processPostRequest(action, request, response);
         } else if ("GET".equals(method)) {
-            //Se llama la función que realizará el procedimiento de la petición GET
             processGetRequest(request, response);
         } else {
             response.sendError(HttpServletResponse.SC_NOT_IMPLEMENTED, "Método no implementado");
         }
     }
+    // Metodo para extraer Id por ruta
+    private Integer extractIdFromPathInfo(String pathInfo) throws ServletException {
+        if (pathInfo == null || pathInfo.equals("/")) {
+            return null;
+        }
+        try {
+            return Integer.parseInt(pathInfo.substring(1));
+        } catch (NumberFormatException e) {
+            throw new ServletException("ID inválido");
+        }
+    }
+    // Método para procesar solicitudes POST
+    private void processPostRequest(String action, HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException, ParseException {
+        String pathInfo = request.getPathInfo();
 
+        Integer id = null;
 
-    //Función que procesa una petición GET
+        if (!"insertar".equalsIgnoreCase(action)) {
+            id = extractIdFromPathInfo(pathInfo);
+        }
+
+        switch (action) {
+            case "insertar":
+                insertContratacion(request, response);
+                break;
+            case "actualizar":
+                if (id == null) {
+                    response.sendError(HttpServletResponse.SC_BAD_REQUEST, "ID no proporcionado para actualizar");
+                    return;
+                }
+
+                // Llama al método para actualizar la contratación con el ID proporcionado
+                updateContratacion(id, request, response);
+                break;
+            case "eliminar":
+                if (id == null) {
+                    response.sendError(HttpServletResponse.SC_BAD_REQUEST, "ID no proporcionado para eliminar");
+                    return;
+                }
+
+                // Llama al método para eliminar la contratación con el ID proporcionado
+                deleteContratacion(id, request, response);
+                break;
+            default:
+                response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Accion desconocida");
+        }
+    }
+    // Método para procesar solicitudes GET
     private void processGetRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        //Obtiene los parámetros de la URL
         String pathInfo = request.getPathInfo();
-        /*
-            Si no existe algún parámetro llama a la función para obtener todas las contrataciones,
-            sino, se llama la función para obtener la contratación por ID
-         */
         if (pathInfo == null || pathInfo.equals("/")) {
             listContrataciones(response);
         } else {
-            /*
-                Se realiza un try para verificara que lo que trae el parámetro sea un número,
-                si no trae un número, dará error NumberFormatException
-             */
             try {
-                //Se llama la función extractIdFromPathInfo para obtener el ID
                 Integer id = extractIdFromPathInfo(pathInfo);
-                //Se llama la función para obtener la contratación
                 getContratacionById(id, response);
             } catch (NumberFormatException e) {
                 response.sendError(HttpServletResponse.SC_BAD_REQUEST, "ID inválido");
@@ -188,76 +129,127 @@ public class ContratacionesController extends HttpServlet {
         }
     }
 
-
-    //Función que procesa una petición POST
-    private void processPostRequest(String action, Contrataciones object, HttpServletResponse response)
+    private void getContratacionById(Integer id, HttpServletResponse response)
             throws IOException {
+        Contrataciones contratacion = contratacionesService.obtenerContratacionPorId(id);
+        if (contratacion != null) {
+            PrintWriter out = response.getWriter();
+            response.setContentType("application/json");
+            response.setCharacterEncoding("UTF-8");
+            out.println(new JSONObject(contratacion));
+            out.flush();
+        } else {
+            response.sendError(HttpServletResponse.SC_NOT_FOUND, "Contratación no encontrada");
+        }
+    }
+    //Función que manda la lista de las contrataciónes
+    private void listContrataciones(HttpServletResponse response)
+            throws IOException {
+        List<Contrataciones> contratacionesList = contratacionesService.obtenerContrataciones();
+        JSONArray json = new JSONArray(contratacionesList);
+        //Obtenemos de la respuesta el escritor que nos ayudará a editar la respuesta
+        PrintWriter out = response.getWriter();
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+        out.println(json);
+        out.flush();
+    }
+    // Método que inserta una nueva Contratacion
+    private void insertContratacion(HttpServletRequest request, HttpServletResponse response)
+            throws IOException, ParseException {
+        StringBuilder buffer = new StringBuilder();
+        BufferedReader reader = request.getReader();
+        String line;
+        while ((line = reader.readLine()) != null) {
+            buffer.append(line);
+        }
+        String data = buffer.toString();
 
-        //Se obtiene el ID de la contratación
-        int id = object.getIdContratacion();
-        /*
-            Se realiza un switch con la acción que se realizará,
-            si la acción es "insertar", se llamará la función para añadir la contratación,
-            si la acción es "actualizar", se llamará la función para actualizar la contratación,
-            si la acción es "eliminar", se llamará la función para eliminar la contratación,
-            y si no obtiene alguno de los datos anteriores, tirará error de que es una acción desconocida
-         */
-        switch (action) {
-            case "insertar" -> insertContratacion(object, response);
-            case "actualizar" -> {
-                /*
-                    Verifica que el ID sea cero,
-                    si es cero, tira un error de que no se ha proporcionado un ID
-                 */
-                if (id == 0) {
-                    response.sendError(HttpServletResponse.SC_BAD_REQUEST, "ID no proporcionado para actualizar");
-                    return;
-                }
-                updateContratacion(object, response);
+        JSONObject jsonObject = new JSONObject(data);
+
+        Contrataciones nuevaContratacion = new Contrataciones(
+                jsonObject.getInt("idDepartamento"),
+                jsonObject.getInt("idEmpleado"),
+                jsonObject.getInt("idCargo"),
+                jsonObject.getInt("idTipoContratacion"),
+                obtieneFechaFormateada(jsonObject.getString("fechaContratacion")),
+                jsonObject.getDouble("salario"),
+                jsonObject.getBoolean("estado")
+        );
+
+        contratacionesService.crearContratacion(nuevaContratacion);
+
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+        response.getWriter().write("{\"message\": \"Contratación creada exitosamente\"}");
+    }
+    // Método que actualiza una nueva Contratacion
+    private void updateContratacion(int id, HttpServletRequest request, HttpServletResponse response)
+            throws IOException, ParseException {
+        String pathInfo = request.getPathInfo();
+        if (pathInfo != null && pathInfo.length() > 1) {
+
+            StringBuilder buffer = new StringBuilder();
+            BufferedReader reader = request.getReader();
+            String line;
+            while ((line = reader.readLine()) != null) {
+                buffer.append(line);
             }
-            case "eliminar" -> {
-                /*
-                    Verifica que el ID sea cero,
-                    si es cero, tira un error de que no se ha proporcionado un ID
-                 */
-                if (id == 0) {
-                    response.sendError(HttpServletResponse.SC_BAD_REQUEST, "ID no proporcionado para eliminar");
-                    return;
-                }
-                deleteContratacion(id, response);
-            }
-            default -> response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Acción desconocida");
+            String data = buffer.toString();
+
+            JSONObject jsonObject = new JSONObject(data);
+            Contrataciones contratacion = new Contrataciones(
+                    id,
+                    jsonObject.getInt("idDepartamento"),
+                    jsonObject.getInt("idEmpleado"),
+                    jsonObject.getInt("idCargo"),
+                    jsonObject.getInt("idTipoContratacion"),
+                    obtieneFechaFormateada(jsonObject.getString("fechaContratacion")),
+                    jsonObject.getDouble("salario"),
+                    jsonObject.getBoolean("estado")
+            );
+
+            contratacionesService.actualizarContratacion(contratacion);
+
+            response.setContentType("application/json");
+            response.setCharacterEncoding("UTF-8");
+            response.getWriter().write("{\"message\": \"Contratación actualizada exitosamente\"}");
+        } else {
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "ID no proporcionado");
         }
     }
 
-    //Función que inserta los headers para evitar error de CORS
-    private void setAccessControlHeaders(HttpServletResponse response) {
-        response.setHeader("Access-Control-Allow-Origin", "*");
-        response.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
-        response.setHeader("Access-Control-Allow-Headers", "*");
-        response.setHeader("Access-Control-Max-Age", "3600");
+    private java.sql.Date obtieneFechaFormateada(String fecha) throws ParseException {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");  // Define el formato esperado
+        java.util.Date parsedDate = dateFormat.parse(fecha);
+        return new java.sql.Date(parsedDate.getTime());
     }
 
+    // Método que elimina una nueva Contratacion
+    private void deleteContratacion(int id, HttpServletRequest request, HttpServletResponse response)
+            throws IOException {
+        String pathInfo = request.getPathInfo();
+        if (pathInfo != null && pathInfo.length() > 1) {
+            contratacionesService.eliminarContratacion(id);
+            response.setContentType("application/json");
+            response.setCharacterEncoding("UTF-8");
+            response.getWriter().write("{\"message\": \"Contratación eliminada exitosamente\"}");
+        } else {
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "ID no proporcionado");
+        }
+    }
 
-    //Función que recibe las peticiones GET
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+    protected void doOptions(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        processRequest(request, response);
-    }
-
-    //Función que recibe las peticiones POST
-    @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        processRequest(request, response);
-    }
-
-    //Función que recibe las peticiones OPTIONS
-    @Override
-    protected void doOptions(HttpServletRequest request, HttpServletResponse response) {
         setAccessControlHeaders(response);
         response.setStatus(HttpServletResponse.SC_OK);
     }
-
+    // Método que configura los encabezados CORS para permitir solicitudes desde cualquier origen
+    private void setAccessControlHeaders(HttpServletResponse response) {
+        response.setHeader("Access-Control-Allow-Origin", "*");
+        response.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+        response.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
+        response.setHeader("Access-Control-Max-Age", "3600");
+    }
 }

@@ -5,7 +5,7 @@ import java.util.Date;
 public class Contrataciones {
     private int idContratacion;
     private int idDepartamento;
-    private int idEmpleada;
+    private int idEmpleado;
     private int idCargo;
     private int idTipoContratacion;
     private Date fechaContratacion;
@@ -14,9 +14,9 @@ public class Contrataciones {
 
     public Contrataciones() {}
 
-    public Contrataciones(int idDepartamento, int idEmpleada, int idCargo, int idTipoContratacion, Date fechaContratacion, double salario, boolean estado) {
+    public Contrataciones(int idDepartamento, int idEmpleado, int idCargo, int idTipoContratacion, Date fechaContratacion, double salario, boolean estado) {
         this.idDepartamento = idDepartamento;
-        this.idEmpleada = idEmpleada;
+        this.idEmpleado = idEmpleado;
         this.idCargo = idCargo;
         this.idTipoContratacion = idTipoContratacion;
         this.fechaContratacion = fechaContratacion;
@@ -24,10 +24,10 @@ public class Contrataciones {
         this.estado = estado;
     }
 
-    public Contrataciones(int idContratacion, int idDepartamento, int idEmpleada, int idCargo, int idTipoContratacion, Date fechaContratacion, double salario, boolean estado) {
+    public Contrataciones(int idContratacion, int idDepartamento, int idEmpleado, int idCargo, int idTipoContratacion, Date fechaContratacion, double salario, boolean estado) {
         this.idContratacion = idContratacion;
         this.idDepartamento = idDepartamento;
-        this.idEmpleada = idEmpleada;
+        this.idEmpleado = idEmpleado;
         this.idCargo = idCargo;
         this.idTipoContratacion = idTipoContratacion;
         this.fechaContratacion = fechaContratacion;
@@ -51,12 +51,12 @@ public class Contrataciones {
         this.idDepartamento = idDepartamento;
     }
 
-    public int getIdEmpleada() {
-        return idEmpleada;
+    public int getIdEmpleado() {
+        return idEmpleado;
     }
 
-    public void setIdEmpleada(int idEmpleada) {
-        this.idEmpleada = idEmpleada;
+    public void setIdEmpleado(int idEmpleado) {
+        this.idEmpleado = idEmpleado;
     }
 
     public int getIdCargo() {

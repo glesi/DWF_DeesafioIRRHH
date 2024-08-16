@@ -1,60 +1,67 @@
 package com.udb.dwf.rrhh.controllers;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.udb.dwf.rrhh.pojos.Cargo;
 import com.udb.dwf.rrhh.services.CargosServices;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.json.JSONArray;
 import org.json.JSONObject;
+
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.List;
-import java.util.stream.Collectors;
 
-//Servlet que maneja el CRUD de la Tabla Cargo
+@WebServlet(name = "CargoController", urlPatterns = {"/cargo/*"})
 public class CargoController extends HttpServlet {
+    // Instancia del servicio para gestionar las operaciones relacionadas con 'Cargo'
+    private final CargosServices cargoService = new CargosServices();
 
-    //Creador GSON para crear objetos desde un JSON
-    Gson gson = new GsonBuilder().create();
-
-    //Instancia de la Clase de Servicios de la Tabla Cargo
-    private final CargosServices services = new CargosServices();
-
-    //Función que manda la lista de los cargos
-    private void listCargo(HttpServletResponse response)
-            throws IOException {
-        //De la instancia de la Clase de Servicios, obtenemos los cargos
-        List<Cargo> cargos = services.obtenerCargos();
-        //Pasamos la lista de los cargos a un objeto JSONArray
-        JSONArray json = new JSONArray(cargos);
-        //Obtenemos de la respuesta el writer que nos ayudará a editar la respuesta
-        PrintWriter out = response.getWriter();
-        //Configuramos la respuesta que el contenido sea "APPLICATION/JSON" y que la codificación sea UTF-8
-        response.setContentType("application/json");
-        response.setCharacterEncoding("UTF-8");
-        //Y finalizamos imprimiendo en la respuesta el JSON con la lista de los cargos
-        out.println(json);
-        out.flush();
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        // Llama al método 'processRequest' para manejar las solicitudes GET
+        processRequest(request, response);
     }
 
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        // Llama al método 'processRequest' para manejar las solicitudes POST
+        processRequest(request, response);
+    }
 
-    //Función que extrae el ID del URL
-    private Integer extractIdFromPathInfo(String pathInfo) throws ServletException {
-        /*
-            Se identifica si el URL no contiene algún ID,
-            si no lo tiene, retorna nulo
-         */
-        if (pathInfo == null || pathInfo.equals("/")) {
-            return null;
+    protected void processRequest(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        response.setHeader("Access-Control-Allow-Origin", "*");
+        response.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+        response.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
+
+        // Obtiene el método HTTP de la solicitud (GET, POST, etc.)
+        String method = request.getMethod();
+        String action = request.getParameter("accion");
+
+        // Verifica el método HTTP y procesa la solicitud en consecuencia
+        if ("POST".equals(method)) {
+            if (action == null) {
+                response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Acción no especificada");
+                return;
+            }
+            processPostRequest(action, request, response);
+        } else if ("GET".equals(method)) {
+            processGetRequest(request, response);
+        } else {
+            response.sendError(HttpServletResponse.SC_NOT_IMPLEMENTED, "Método no implementado");
         }
-        /*
-            Realiza el cambio de string a Integer,
-            si no lo tiene, entonces da un NumberFormatException.
-         */
+    }
+
+    private Integer extractIdFromPathInfo(String pathInfo) throws ServletException {
+        if (pathInfo == null || pathInfo.equals("/")) {
+            throw new ServletException("Ruta inválida.");
+        }
         try {
             return Integer.parseInt(pathInfo.substring(1));  // Extrae el ID de la URL
         } catch (NumberFormatException e) {
@@ -62,20 +69,53 @@ public class CargoController extends HttpServlet {
         }
     }
 
-    //Función que obtiene el cargo seleccionado por ID
+    private void processPostRequest(String action, HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        String pathInfo = request.getPathInfo();
+
+        Integer id = null;
+
+        if (!"insertar".equalsIgnoreCase(action)) {
+            id = extractIdFromPathInfo(pathInfo);
+        }
+
+        switch (action) {
+            case "insertar":
+                insertCargo(request, response);
+                break;
+            case "actualizar":
+                updateCargo(id, request, response);
+                break;
+            case "eliminar":
+                if (id == null) {
+                    response.sendError(HttpServletResponse.SC_BAD_REQUEST, "ID no proporcionado para eliminar");
+                    return;
+                }
+                deleteCargo(id, request, response);
+                break;
+            default:
+                response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Acción desconocida");
+        }
+    }
+
+    private void processGetRequest(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        String pathInfo = request.getPathInfo();
+        if (pathInfo == null || pathInfo.equals("/")) {
+            listCargo(response);
+        } else {
+            try {
+                Integer id = extractIdFromPathInfo(pathInfo);
+                getCargoById(id, response);
+            } catch (NumberFormatException e) {
+                response.sendError(HttpServletResponse.SC_BAD_REQUEST, "ID inválido");
+            }
+        }
+    }
+
     private void getCargoById(Integer id, HttpServletResponse response)
             throws IOException {
-        /*
-            Se llama al servicio para obtener con el parámetro del ID al cargo
-            que se necesita
-         */
-        Cargo cargo = services.obtenerCargoPorId(id);
-        /*
-            Verifica si el cargo es distinto de nulo,
-            si es distinto de nulo, se obtiene el writer de la respuesta para enviar
-            el cargo, si no,
-            envía un error con el mensaje que no se encontró el cargo deseado
-         */
+        Cargo cargo = cargoService.obtenerCargoPorId(id);
         if (cargo != null) {
             PrintWriter out = response.getWriter();
             response.setContentType("application/json");
@@ -87,177 +127,82 @@ public class CargoController extends HttpServlet {
         }
     }
 
-    //Función que añade un cargo nuevo
-    private void insertCargo(Cargo object, HttpServletResponse response)
+    private void listCargo(HttpServletResponse response)
             throws IOException {
-        //Se llama al servicio con la función de crearCargo enviando el objeto como parámetro
-        services.crearCargo(object);
-        //Se crea el json del mensaje a enviar que se ha creado exitosamente
-        JSONObject json = new JSONObject();
-        json.put("message", "Cargo creado exitosamente");
-        response.getWriter().println(json);
+        List<Cargo> cargoList = cargoService.obtenerCargos();
+        JSONArray json = new JSONArray(cargoList);
+        PrintWriter out = response.getWriter();
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+        out.println(json);
+        out.flush();
     }
 
-    //Función que actualiza un cargo agregado anteriormente
-    private void updateCargo(Cargo object, HttpServletResponse response)
+    private void insertCargo(HttpServletRequest request, HttpServletResponse response)
             throws IOException {
-        //Se llama al servicio con la función de actualizarCargo enviando el objeto como parámetro
-        services.actualizarCargo(object);
-        //Se crea el json del mensaje a enviar que se ha actualizado exitosamente
-        JSONObject json = new JSONObject();
-        json.put("message", "Cargo actualizado exitosamente");
-        response.getWriter().println(json);
-    }
-
-    //Función que elimina un cargo
-    private void deleteCargo(int id, HttpServletResponse response)
-            throws IOException {
-        //Se llama al servicio con la función de eliminarCargo enviando el ID como parámetro
-        services.eliminarCargo(id);
-        //Se crea el json del mensaje a enviar que se ha eliminado exitosamente
-        JSONObject json = new JSONObject();
-        json.put("message", "Cargo eliminado exitosamente");
-        response.getWriter().println(json);
-    }
-
-    //Función que procesa las peticiones en general
-    protected void processRequest(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        //Se inserta los headers necesarios para evitar error CORS
-        setAccessControlHeaders(response);
-        //Se obtiene el método que se ocupará
-        String method = request.getMethod();
-        /*
-            Verifica que método se ocupará, si es POST realizará el procedimiento para la petición POST,
-            si es GET, realizara el procedimiento para la petición GET,
-            si no, tirará error que no existe algún método implementado
-         */
-        if ("POST".equals(method)) {
-            //Se obtiene los datos del Body
-            String requestData = request.getReader().lines().collect(Collectors.joining());
-            //Transforma el Body a JSON
-            JSONObject bodyJSON = new JSONObject(requestData);
-            //Se obtiene la acción que se ejecutará
-            String action = bodyJSON.getString("action");
-            //Se obtiene el JSON a utilizar y luego lo transforma al objeto Cargo
-            String jsonString = bodyJSON.getJSONObject("json").toString();
-            Cargo object = gson.fromJson(jsonString, Cargo.class);
-            /*
-                Si la acción es nula, tirará el error de que no sé específico la acción
-             */
-            if (action == null) {
-                response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Acción no especificada");
-                return;
-            }
-            //Se llama la función que realizará el procedimiento de la petición POST
-            processPostRequest(action, object, response);
-        } else if ("GET".equals(method)) {
-            //Se llama la función que realizará el procedimiento de la petición GET
-            processGetRequest(request, response);
-        } else {
-            response.sendError(HttpServletResponse.SC_NOT_IMPLEMENTED, "Método no implementado");
+        StringBuilder buffer = new StringBuilder();
+        BufferedReader reader = request.getReader();
+        String line;
+        while ((line = reader.readLine()) != null) {
+            buffer.append(line);
         }
+        String data = buffer.toString();
+
+        JSONObject jsonObject = new JSONObject(data);
+        String cargoStr = jsonObject.getString("cargo");
+        String descripcionCargoStr = jsonObject.getString("descripcionCargo");
+        boolean jefatura = jsonObject.getBoolean("jefatura");
+
+        Cargo newCargo = new Cargo(0, cargoStr, descripcionCargoStr, jefatura);
+        cargoService.crearCargo(newCargo);
+
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+        response.getWriter().write("{\"message\": \"Cargo creado exitosamente\"}");
     }
 
-
-    //Función que procesa una petición GET
-    private void processGetRequest(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        //Obtiene los parámetros de la URL
-        String pathInfo = request.getPathInfo();
-        /*
-            Si no existe algún parámetro llama a la función para obtener todos los cargos,
-            sino, se llama la función para obtener el cargo por ID
-         */
-        if (pathInfo == null || pathInfo.equals("/")) {
-            listCargo(response);
-        } else {
-            /*
-                Se realiza un try para verificara que lo que trae el parámetro sea un número,
-                si no trae un número, dará error NumberFormatException
-             */
-            try {
-                //Se llama la función extractIdFromPathInfo para obtener el ID
-                Integer id = extractIdFromPathInfo(pathInfo);
-                //Se llama la función para obtener el cargo
-                getCargoById(id, response);
-            } catch (NumberFormatException e) {
-                response.sendError(HttpServletResponse.SC_BAD_REQUEST, "ID inválido");
-            }
-        }
-    }
-
-
-    //Función que procesa una petición POST
-    private void processPostRequest(String action, Cargo object, HttpServletResponse response)
+    private void updateCargo(int id, HttpServletRequest request, HttpServletResponse response)
             throws IOException {
-
-        //Se obtiene el ID del cargo
-        int id = object.getIdCargo();
-
-        /*
-            Se realiza un switch con la acción que se realizará,
-            si la acción es "insertar", se llamará la función para añadir el cargo,
-            si la acción es "actualizar", se llamará la función para actualizar el cargo,
-            si la acción es "eliminar", se llamará la función para eliminar el cargo,
-            y si no obtiene alguno de los datos anteriores, tirará error de que es una acción desconocida
-         */
-        switch (action) {
-            case "insertar" -> insertCargo(object, response);
-            case "actualizar" -> {
-                /*
-                    Verifica que el ID sea cero,
-                    si es cero, tira un error de que no se ha proporcionado un ID
-                 */
-                if (id == 0) {
-                    response.sendError(HttpServletResponse.SC_BAD_REQUEST, "ID no proporcionado para actualizar");
-                    return;
-                }
-                updateCargo(object, response);
-            }
-            case "eliminar" -> {
-                /*
-                    Verifica que el ID sea cero,
-                    si es cero, tira un error de que no se ha proporcionado un ID
-                 */
-                if (id == 0) {
-                    response.sendError(HttpServletResponse.SC_BAD_REQUEST, "ID no proporcionado para eliminar");
-                    return;
-                }
-                deleteCargo(id, response);
-            }
-            default -> response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Acción desconocida");
+        StringBuilder buffer = new StringBuilder();
+        BufferedReader reader = request.getReader();
+        String line;
+        while ((line = reader.readLine()) != null) {
+            buffer.append(line);
         }
+        String data = buffer.toString();
+
+        JSONObject jsonObject = new JSONObject(data);
+        String cargoStr = jsonObject.getString("cargo");
+        String descripcionCargoStr = jsonObject.getString("descripcionCargo");
+        boolean jefatura = jsonObject.getBoolean("jefatura");
+
+        Cargo cargo = new Cargo(id, cargoStr, descripcionCargoStr, jefatura);
+        cargoService.actualizarCargo(cargo);
+
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+        response.getWriter().write("{\"message\": \"Cargo actualizado exitosamente\"}");
     }
 
-    //Función que inserta los headers para evitar error de CORS
-    private void setAccessControlHeaders(HttpServletResponse response) {
-        response.setHeader("Access-Control-Allow-Origin", "*");
-        response.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
-        response.setHeader("Access-Control-Allow-Headers", "*");
-        response.setHeader("Access-Control-Max-Age", "3600");
+    private void deleteCargo(int id, HttpServletRequest request, HttpServletResponse response)
+            throws IOException {
+        cargoService.eliminarCargo(id);
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+        response.getWriter().write("{\"message\": \"Cargo eliminado exitosamente\"}");
     }
 
-
-    //Función que recibe las peticiones GET
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+    protected void doOptions(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        processRequest(request, response);
-    }
-
-    //Función que recibe las peticiones POST
-    @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        processRequest(request, response);
-    }
-
-    //Función que recibe las peticiones OPTIONS
-    @Override
-    protected void doOptions(HttpServletRequest request, HttpServletResponse response) {
         setAccessControlHeaders(response);
         response.setStatus(HttpServletResponse.SC_OK);
     }
 
+    private void setAccessControlHeaders(HttpServletResponse response) {
+        response.setHeader("Access-Control-Allow-Origin", "*");
+        response.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+        response.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
+        response.setHeader("Access-Control-Max-Age", "3600");
+    }
 }
