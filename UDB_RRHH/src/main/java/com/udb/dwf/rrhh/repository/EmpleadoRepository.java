@@ -70,7 +70,7 @@ public class EmpleadoRepository {
 
             while(resultSet.next()){
                 int idEmpleado = resultSet.getInt("idEmpleado");
-                String numeroDui = resultSet.getString(" numeroDui");
+                String numeroDui = resultSet.getString("numeroDui");
                 String nombrePersona = resultSet.getString("nombrePersona");
                 String usuario = resultSet.getString("usuario");
                 String numeroTelefono = resultSet.getString("numeroTelefono");

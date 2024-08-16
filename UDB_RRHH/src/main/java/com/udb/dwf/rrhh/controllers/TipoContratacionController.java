@@ -15,7 +15,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.List;
 
-@WebServlet(name = "TipoContratacionController", urlPatterns = {"/tipo-contratacion/*"})
+@WebServlet(name = "TipoContratacionController", urlPatterns = {"/tipoContratacion/*"})
 public class TipoContratacionController extends HttpServlet {
     // Se instancia el servicio para gestionar las operaciones relacionadas con 'TipoContratacion'
     private final TipoContratacionesServices tipoContratacionService = new TipoContratacionesServices();

@@ -5,9 +5,9 @@ import { Observable } from 'rxjs';
 @Injectable({
   providedIn: 'root'
 })
-export class TipoContratacionService {
+export class ContratacionService {
 
-  API_URL : string = 'http://localhost:8080/UDB_RRHH/tipoContrataciones';
+  API_URL : string = 'http://localhost:8080/UDB_RRHH/contrataciones';
 
   constructor(private httpClient : HttpClient) { }
 

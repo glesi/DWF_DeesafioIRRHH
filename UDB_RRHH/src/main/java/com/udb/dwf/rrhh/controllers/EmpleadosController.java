@@ -81,10 +81,6 @@ public class EmpleadosController extends HttpServlet {
                 insertEmpleado(request, response);
                 break;
             case "actualizar":
-                if (id == null) {
-                    response.sendError(HttpServletResponse.SC_BAD_REQUEST, "ID no proporcionado para actualizar");
-                    return;
-                }
                 updateEmpleado(id, request, response);
                 break;
             case "eliminar":
