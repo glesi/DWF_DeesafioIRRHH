@@ -221,3 +221,13 @@ nbdist/
 #Node
 UDB_RRHH/target/UDB_RRHH/frontend/.angular/
 UDB_RRHH/target/UDB_RRHH/frontend/node_modules/
+
+## Idea modules
+
+UDB_RRHH/.idea/.name
+UDB_RRHH/.idea/UDB_RRHH.iml
+UDB_RRHH/.idea/modules.xml
+UDB_RRHH/.idea/sqldialects.xml
+.idea/
+
+
