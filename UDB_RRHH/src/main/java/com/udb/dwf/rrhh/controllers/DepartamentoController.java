@@ -190,28 +190,9 @@ public class DepartamentoController extends HttpServlet {
     }
     // Método que actualiza un departamento existente
     private void updateDepartamento(int id, Departamento object, HttpServletRequest request, HttpServletResponse response) throws IOException {
-//        StringBuilder buffer = new StringBuilder();
-//        BufferedReader reader = request.getReader();
-//        String line;
-//        while ((line = reader.readLine()) != null) {
-//            buffer.append(line);
-//        }
-//        String data = buffer.toString();
         response.setHeader("Access-Control-Allow-Origin", "*");
         response.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
         response.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
-        String requestData = request.getReader().lines().collect(Collectors.joining());
-//
-//        JSONObject jsonObject = new JSONObject(requestData);
-//        System.out.println(jsonObject);
-//        String nombreDepartamento = jsonObject.getString("nombreDepartamento");
-//        String descripcionDepartamento = jsonObject.getString("descripcionDepartamento");
-//
-//        Departamento departamento = new Departamento();
-//        departamento.setIdDepartamento(id);
-//        departamento.setNombreDepartamento(nombreDepartamento);
-//        departamento.setDescripcionDepartamento(descripcionDepartamento);
-
         departamentoServices.actualizarDepartamento(object);
 
         response.setContentType("application/json");
@@ -220,6 +201,10 @@ public class DepartamentoController extends HttpServlet {
     }
     // Método que elimina un departamento existente
     private void deleteDepartamento(int id, HttpServletRequest request, HttpServletResponse response) throws IOException {
+        response.setHeader("Access-Control-Allow-Origin", "*");
+        response.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+        response.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
+
         departamentoServices.eliminarDepartamento(id);
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");

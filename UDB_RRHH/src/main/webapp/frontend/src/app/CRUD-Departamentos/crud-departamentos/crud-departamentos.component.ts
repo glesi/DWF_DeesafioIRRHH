@@ -37,10 +37,10 @@ export class CRUDDepartamentosComponent {
   }
 
   getDepartamento() {
-    if (this.departamentoSend.idDepartamento > 0){
-      this.path = '/'+this.departamentoSend.idDepartamento;
-    }
-    console.log(this.path);
+    // if (this.departamentoSend.idDepartamento > 0){
+    //   this.path = '/'+this.departamentoSend.idDepartamento;
+    // }
+    // console.log(this.path);
     this.departamentoSrv.get(this.path).subscribe({
       next: (result) => {
         this.departamentos = result;
@@ -72,7 +72,7 @@ export class CRUDDepartamentosComponent {
 
     }
     if(this.departamentoSend.nombreDepartamento.trim().length > 0 || this.departamentoSend.descripcionDepartamento.trim().length > 0 ){
-      this.departamentoSrv.post(object).subscribe({
+      this.departamentoSrv.post(this.path,object).subscribe({
         next: (result) => {
           Swal.fire({
             position: "center",
@@ -117,7 +117,7 @@ export class CRUDDepartamentosComponent {
     }
 
     if (this.departamentoSend.nombreDepartamento.trim().length > 0 || this.departamentoSend.descripcionDepartamento.trim().length > 0 ) {
-      this.departamentoSrv.post(object).subscribe({
+      this.departamentoSrv.post(this.path,object).subscribe({
         next: (result) => {
           Swal.fire({
             position: "center",
@@ -155,11 +155,12 @@ export class CRUDDepartamentosComponent {
   deleteDepartamento() {
     //Agregar objeto
     var object = {
-      "action": "eliminar",
+      "accion": "eliminar",
       "json": this.departamentoSend,
     }
-    this.departamentoSrv.post(object).subscribe({
+    this.departamentoSrv.post(this.path,object).subscribe({
       next: (result) => {
+        console.log(this.path)
         Swal.fire({
           position: "center",
           icon: "success",
