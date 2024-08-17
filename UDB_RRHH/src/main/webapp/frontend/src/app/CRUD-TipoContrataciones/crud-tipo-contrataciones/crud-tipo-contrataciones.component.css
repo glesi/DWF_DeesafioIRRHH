@@ -356,7 +356,7 @@ tbody tr:hover {
     border: 1px solid #2ba6cb;
   }
 
-  table td {
+  .table td {
     border: none;
     border-bottom: 1px solid #dddddd;
     position: relative;

@@ -1,18 +1,33 @@
-import { Component } from '@angular/core';
+import {Component, NO_ERRORS_SCHEMA} from '@angular/core';
 import { TipoContratacionService } from '../../../services/tipoContratacionService/tipoContratacion.service';
+import {ViewService} from "../../../services/viewService/view.service";
+import {CommonModule} from "@angular/common";
+import {Empleado, TipoContratacion} from "../../Interfaces/Interfaces";
+import {RouterLink, RouterLinkActive, RouterOutlet} from "@angular/router";
+
 
 @Component({
   selector: 'app-landing-page',
   standalone: true,
-  imports: [],
+  imports: [CommonModule, RouterOutlet, RouterLink, RouterLinkActive],
   templateUrl: './landing-page.component.html',
-  styleUrl: './landing-page.component.css'
+  styleUrl: './landing-page.component.css',
+  schemas: [NO_ERRORS_SCHEMA]
 })
+
+
 export class LandingPageComponent {
 
-  constructor(private tipoContratacionService: TipoContratacionService) {}
+  constructor(private tipoContratacionService: TipoContratacionService, private viewSrv: ViewService) {}
 
+
+
+  viewDatos:Empleado[] =[];
+  contratraciones: TipoContratacion[]=[];
+  contratracionesSend: TipoContratacion[]=[];
   ngOnInit(): void {
+    this.getTipoContrataciones();
+    this.getViewDatos();
   }
 
   object : any = {
@@ -26,6 +41,7 @@ export class LandingPageComponent {
   getTipoContrataciones() {
     this.tipoContratacionService.get().subscribe({
       next: (result) => {
+        this.contratraciones = result;
         console.log(result)
       },
       error: (error) => {
@@ -63,7 +79,8 @@ export class LandingPageComponent {
   deleteTipoContrataciones() {
     //Agregar objeto
     var object = {
-      "action": "eliminar"
+      "action": "eliminar",
+      "json": this.contratracionesSend,
     }
     this.tipoContratacionService.post(object).subscribe({
       next: (result) => {
@@ -71,6 +88,18 @@ export class LandingPageComponent {
       },
       error: (error) => {
         console.log(error)
+      }
+    })
+  }
+
+  getViewDatos(){
+    this.viewSrv.get().subscribe({
+      next: (result) => {
+        this.viewDatos = result;
+        console.log(this.viewDatos);
+      },
+      error: (error) => {
+        console.log("Error: "+error);
       }
     })
   }

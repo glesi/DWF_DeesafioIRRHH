@@ -11,8 +11,8 @@ export class DepartamentoService {
 
   constructor(private httpClient : HttpClient) { }
 
-  get(): Observable<any> {
-    return this.httpClient.get(this.API_URL).pipe(res => res);
+  get(path: string): Observable<any> {
+    return this.httpClient.get(this.API_URL+path).pipe(res => res);
   }
 
   post(object : any): Observable<any> {
