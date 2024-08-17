@@ -9,17 +9,21 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @WebServlet(name = "TipoContratacionController", urlPatterns = {"/tipoContratacion/*"})
 public class TipoContratacionController extends HttpServlet {
     // Se instancia el servicio para gestionar las operaciones relacionadas con 'TipoContratacion'
     private final TipoContratacionesServices tipoContratacionService = new TipoContratacionesServices();
-
+    Gson gson = new GsonBuilder().setPrettyPrinting().create();
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -41,14 +45,24 @@ public class TipoContratacionController extends HttpServlet {
         response.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
      // Obtiene el método HTTP de la solicitud (GET, POST, etc.)
         String method = request.getMethod();
-        String action = request.getParameter("accion");
+//        String action = request.getParameter("accion");
      //Verifica el método HTTP y procesa la solicitud en consecuencia
         if ("POST".equals(method)) {
+            //Se obtiene los datos del Body
+            String requestData = request.getReader().lines().collect(Collectors.joining());
+            //Transforma el body del request en JSON
+            JSONObject bodyJson = new JSONObject(requestData);
+            //Obtener propiedad accion del request
+            String action = bodyJson.getString("accion");
+            //Se obtiene el JSON a utilizar
+            String jsonString = bodyJson.getJSONObject("json").toString();
+            //Se transforma el contenido del JSON a un objeto tipo TipoContratacion
+            TipoContratacion object = gson.fromJson(jsonString, TipoContratacion.class);
             if (action == null) {
                 response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Accion no especificada");
                 return;
             }
-            processPostRequest(action, request, response);
+            processPostRequest(action,object, request, response);
         } else if ("GET".equals(method)) {
             processGetRequest(request, response);
         } else {
@@ -67,7 +81,7 @@ public class TipoContratacionController extends HttpServlet {
         }
     }
 
-    private void processPostRequest(String action, HttpServletRequest request, HttpServletResponse response)
+    private void processPostRequest(String action, TipoContratacion object, HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         String pathInfo = request.getPathInfo();
 
@@ -79,14 +93,14 @@ public class TipoContratacionController extends HttpServlet {
 
         switch (action) {
             case "insertar":
-                insertTipoContratacion(request, response);
+                insertTipoContratacion(object,request, response);
                 break;
             case "actualizar":
                 if (id == null) {
                     response.sendError(HttpServletResponse.SC_BAD_REQUEST, "ID no proporcionado para actualizar");
                     return;
                 }
-                updateTipoContratacion(id, request, response);
+                updateTipoContratacion(id,object, request, response);
                 break;
             case "eliminar":
                 if (id == null) {
@@ -140,42 +154,21 @@ public class TipoContratacionController extends HttpServlet {
         out.flush();
     }
 
-    private void insertTipoContratacion(HttpServletRequest request, HttpServletResponse response)
+    private void insertTipoContratacion(TipoContratacion object, HttpServletRequest request, HttpServletResponse response)
             throws IOException {
-        StringBuilder buffer = new StringBuilder();
-        BufferedReader reader = request.getReader();
-        String line;
-        while ((line = reader.readLine()) != null) {
-            buffer.append(line);
-        }
-        String data = buffer.toString();
-
-        JSONObject jsonObject = new JSONObject(data);
-        String tipoContratacionStr = jsonObject.getString("tipoContratacion");
-
-        TipoContratacion newTipoContratacion = new TipoContratacion(0, tipoContratacionStr);
-        tipoContratacionService.crearTipoContratacion(newTipoContratacion);
+        tipoContratacionService.crearTipoContratacion(object);
 
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
         response.getWriter().write("{\"message\": \"Tipo de contratación creado exitosamente\"}");
     }
 
-    private void updateTipoContratacion(int id, HttpServletRequest request, HttpServletResponse response)
+    private void updateTipoContratacion(int id, TipoContratacion object, HttpServletRequest request, HttpServletResponse response)
             throws IOException {
-        StringBuilder buffer = new StringBuilder();
-        BufferedReader reader = request.getReader();
-        String line;
-        while ((line = reader.readLine()) != null) {
-            buffer.append(line);
-        }
-        String data = buffer.toString();
-
-        JSONObject jsonObject = new JSONObject(data);
-        String tipoContratacionStr = jsonObject.getString("tipoContratacion");
-
-        TipoContratacion tipoContratacion = new TipoContratacion(id, tipoContratacionStr);
-        tipoContratacionService.actualizarTipoContratacion(tipoContratacion);
+        response.setHeader("Access-Control-Allow-Origin", "*");
+        response.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+        response.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
+        tipoContratacionService.actualizarTipoContratacion(object);
 
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
