@@ -1,0 +1,40 @@
+export interface Empleado {
+  correoInstitucional: string;
+  idEmpleado: number;
+  fechaNacimiento: string;
+  fechaContratacion: string;
+  numeroDui: string;
+  salario: number;
+  nombrePersona: string;
+  cargo: string;
+  numeroTelefono: string;
+}
+export interface TipoContratacion {
+  idTipoContratacion: number;
+  tipoContratacion: string;
+}
+
+export interface Departamento {
+  idDepartamento: number;
+  nombreDepartamento: string;
+  descripcionDepartamento: string;
+
+}
+
+export interface Cargo {
+  idCargo: number;
+  cargo: string;
+  descripcionCargo: string;
+  jefatura: boolean;
+}
+
+export interface Contrataciones {
+  idContratacion: number;
+  idDepartamento: number;
+  idEmpleado: number;
+  idCargo: number;
+  idTipoContratacion: number;
+  fechaContratacion: string;
+  salario: number;
+  estado: boolean;
+}

@@ -1,6 +1,6 @@
 <!doctype html>
 <html lang="en">
-<head>
+<head >
   <meta charset="utf-8">
   <title>Frontend</title>
   <base href="/">
@@ -14,7 +14,39 @@
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 </head>
+<div class="navbar">
+  <div class="logo">
+    <img src="https://www.udb.edu.sv/editorial/images/Logo%20UDB%20letras%20blancas%20transparente.png" alt="Logo">
+    <a href="#" style="color: white; text-decoration: none;">UDB HR Manager System</a>
+  </div>
+  <div class="menu">
+    <a routerLink="/crud-tipo-contrataciones" routerLinkActive="active">Edit Contrataciones</a>
+    <a href="#">Edit Departamentos</a>
+    <a href="#">Bajas</a>
+    <a href="#">Cambios</a>
+    <a href="#">Consultas</a>
+  </div>
+  <!--  <div class="perfil">-->
+  <!--    <div class="contenido-perfil">-->
+  <!--      <p>USUARIO</p>-->
+  <!--      <img src="https://cdn-icons-png.flaticon.com/512/3177/3177440.png" alt="Usuario">-->
+  <!--    </div>-->
+  <!--    <div class="desplegable">-->
+  <!--      <a href="#">Perfil</a>-->
+  <!--      <a href="#">Configuraciones</a>-->
+  <!--      <a href="#">Ayuda</a>-->
+  <!--      <a href="#">Cerrar Sesión</a>-->
+  <!--    </div>-->
+  <!--  </div>-->
+  <div class="menu-toggle" onclick="toggleMenu()">
+    <div></div>
+    <div></div>
+    <div></div>
+
+  </div>
+</div>
 <body>
   <app-root></app-root>
+  <router-outlet></router-outlet>
 </body>
 </html>
