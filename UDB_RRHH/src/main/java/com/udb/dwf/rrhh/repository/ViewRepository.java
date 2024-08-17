@@ -48,8 +48,9 @@ public class ViewRepository {
         Connection con = null;
         try{
             con = Conexion.getConexion();
-            String query = "{call ObtenerDatosEmpleadosById(idEmpleado)}";
+            String query = "{call ObtenerEmpleadoById(?)}";
             try(CallableStatement sp = con.prepareCall(query)){
+                sp.setInt(1, id);
                 try(ResultSet rs= sp.executeQuery()){
                     while (rs.next()) {
                         int idEmpleado = rs.getInt("idEmpleado");

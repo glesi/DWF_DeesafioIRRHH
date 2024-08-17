@@ -15,12 +15,11 @@ import Swal from "sweetalert2";
 })
 export class CRUDTipoContratacionesComponent {
 
-  // @ViewChild()
   //Declaracion de array para guardar la response del GET
   contratraciones: TipoContratacion[]=[];
   //Declaracion de objeto para enviar solicitudes por POST
   contratracionesSend: TipoContratacion={idTipoContratacion:0, tipoContratacion:''};
-
+  path : string = '';
   allDisabled = false;
 
   constructor(private tipoContratacionesSrv : TipoContratacionService) {}
@@ -30,7 +29,10 @@ export class CRUDTipoContratacionesComponent {
   }
 
   getTipoContrataciones() {
-    this.tipoContratacionesSrv.get().subscribe({
+    if(this.contratracionesSend.idTipoContratacion>0){
+      this.path='/'+this.contratracionesSend.idTipoContratacion;
+    }
+    this.tipoContratacionesSrv.get(this.path).subscribe({
       next: (result) => {
         this.contratraciones = result;
         console.log(result)
@@ -42,55 +44,91 @@ export class CRUDTipoContratacionesComponent {
   }
 
   saveTipoContrataciones() {
-    // this.contratracionesSend = {idTipoContratacion:0, tipoContratacion:''};
+
     var object = {
       "action": "insertar",
       "json": this.contratracionesSend,
 
     }
-    console.log(this.contratracionesSend);
-    this.tipoContratacionesSrv.post(object).subscribe({
-      next: (result) => {
-        Swal.fire({
-          position: "center",
-          icon: "success",
-          title: "Se agrego exitosamente",
-          showConfirmButton: false,
-          timer: 1500
-        }).then(()=>{
+    if(this.contratracionesSend.tipoContratacion.trim().length > 0){
+      this.tipoContratacionesSrv.post(object).subscribe({
+        next: (result) => {
+          Swal.fire({
+            position: "center",
+            icon: "success",
+            title: "Se agrego exitosamente",
+            showConfirmButton: false,
+            timer: 1500
+          }).then(()=>{
             location.reload()
             console.log(result)
-        });
+          });
 
-      },
-      error: (error) => {
-        Swal.fire({
-          position: "center",
-          icon: "error",
-          title: "No se pudo agregar el elemento nuevo",
-          showConfirmButton: false,
-          timer: 1500
-        })
-        console.log(error)
-      }
-    })
+        },
+        error: (error) => {
+          Swal.fire({
+            position: "center",
+            icon: "error",
+            title: "No se pudo agregar el elemento nuevo",
+            showConfirmButton: false,
+            timer: 1500
+          })
+          console.log(error)
+        }
+      })
+    } else{
+      Swal.fire({
+        position: "center",
+        icon:"warning",
+        title: "Valor invalido - No se aceptan cadenas vacias",
+        showConfirmButton: true,}
+      )
+    }
+    console.log(this.contratracionesSend);
+
   }
 
   updateTipoContrataciones() {
-    this.contratracionesSend = {idTipoContratacion:0, tipoContratacion:''};
     //Agregar objeto
     var object = {
       "action": "actualizar",
       "json": this.contratracionesSend,
     }
-    this.tipoContratacionesSrv.post(object).subscribe({
-      next: (result) => {
-        console.log(result)
-      },
-      error: (error) => {
-        console.log(error)
-      }
-    })
+
+    if (this.contratracionesSend.tipoContratacion.trim().length > 0) {
+      this.tipoContratacionesSrv.post(object).subscribe({
+        next: (result) => {
+          Swal.fire({
+            position: "center",
+            icon: "success",
+            title: "Actualizacion procesada",
+            showConfirmButton: false,
+            timer: 1500
+          }).then(() => {
+            location.reload()
+            console.log(result)
+          });
+
+        },
+        error: (error) => {
+          Swal.fire({
+            position: "center",
+            icon: "error",
+            title: "No se pudo actualizar elemento",
+            showConfirmButton: false,
+            timer: 1500
+          })
+          console.log(error)
+        }
+      })
+    } else {
+      Swal.fire({
+        position: "center",
+        icon: "warning",
+        title: "Valor invalido - No se aceptan cadenas vacias",
+        showConfirmButton: true,
+      })
+    }
   }
 
   deleteTipoContrataciones() {
@@ -128,12 +166,9 @@ export class CRUDTipoContratacionesComponent {
 
   onCheckBoxChange(event: Event,idTipoContratacion:number ): void {
     const trg = event.target as HTMLInputElement;
-    if(trg.checked){
-
       this.contratracionesSend.idTipoContratacion= idTipoContratacion;
+      this.getTipoContrataciones();
       console.log(this.contratracionesSend.idTipoContratacion);
 
-
-    }
   }
 }

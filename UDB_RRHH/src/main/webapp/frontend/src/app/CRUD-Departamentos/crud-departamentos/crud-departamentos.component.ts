@@ -21,7 +21,7 @@ export class CRUDDepartamentosComponent {
   departamentos: Departamento[]=[];
   //Declaracion de objeto para enviar solicitudes por POST
   departamentoSend: Departamento={idDepartamento:0, nombreDepartamento:'',descripcionDepartamento:''};
-  path : string = '';
+  path : string = '/';
 
 
   constructor(private departamentoSrv : DepartamentoService) {}
@@ -30,10 +30,13 @@ export class CRUDDepartamentosComponent {
     this.getDepartamento();
   }
 
-  getDepartamento() {
-    if (this.departamentoSend.idDepartamento == 0){
-      this.path = ''
+  assignPath(){
+    if (this.departamentoSend.idDepartamento > 0){
+      this.path = '/'+this.departamentoSend.idDepartamento;
     }
+  }
+
+  getDepartamento() {
     if (this.departamentoSend.idDepartamento > 0){
       this.path = '/'+this.departamentoSend.idDepartamento;
     }
@@ -41,7 +44,19 @@ export class CRUDDepartamentosComponent {
     this.departamentoSrv.get(this.path).subscribe({
       next: (result) => {
         this.departamentos = result;
-        // console.log(result)
+        console.log(result)
+      },
+      error: (error) => {
+        console.log(error)
+      }
+    })
+  }
+
+  getDepartamentoByID(){
+    this.departamentoSrv.get(this.path).subscribe({
+      next: (result) => {
+        this.departamentoSend = result;
+        console.log(result)
       },
       error: (error) => {
         console.log(error)
@@ -52,7 +67,7 @@ export class CRUDDepartamentosComponent {
   saveDepartamento() {
 
     var object = {
-      "action": "insertar",
+      "accion": "insertar",
       "json": this.departamentoSend,
 
     }
@@ -97,7 +112,7 @@ export class CRUDDepartamentosComponent {
   updateDepartamento() {
     //Agregar objeto
     var object = {
-      "action": "actualizar",
+      "accion": "actualizar",
       "json": this.departamentoSend,
     }
 
@@ -173,8 +188,11 @@ export class CRUDDepartamentosComponent {
   onCheckBoxChange(event: Event,idDepartment:number ): void {
     const trg = event.target as HTMLInputElement;
     this.departamentoSend.idDepartamento= idDepartment;
-    this.getDepartamento();
+    this.assignPath();
+    this.getDepartamentoByID();
     console.log(this.departamentoSend.idDepartamento);
 
   }
+
+
 }
