@@ -7,7 +7,7 @@ import { Observable } from 'rxjs';
 })
 export class TipoContratacionService {
 
-  API_URL : string = 'http://localhost:8080/UDB_RRHH/tipoContrataciones';
+  API_URL : string = 'http://localhost:8080/UDB_RRHH/tipoContratacion';
 
   constructor(private httpClient : HttpClient) { }
 
