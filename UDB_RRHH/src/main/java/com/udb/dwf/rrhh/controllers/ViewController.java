@@ -8,6 +8,7 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.IOException;
@@ -36,7 +37,8 @@ public class ViewController extends HttpServlet {
             response.setContentType("application/json");
             response.setCharacterEncoding("UTF-8");
             //Y finalizamos imprimiendo en la respuesta el JSON con la vista
-            out.println(new JSONObject(viewList));
+            JSONArray jsonArray = new JSONArray(viewList);
+            out.println(jsonArray);
             out.flush();
         } catch (IOException e) {
             throw new RuntimeException(e);
