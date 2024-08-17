@@ -2,8 +2,11 @@ import {Component, NO_ERRORS_SCHEMA} from '@angular/core';
 import { TipoContratacionService } from '../../../services/tipoContratacionService/tipoContratacion.service';
 import {ViewService} from "../../../services/viewService/view.service";
 import {CommonModule} from "@angular/common";
-import {Empleado, TipoContratacion} from "../../Interfaces/Interfaces";
+import {Contrataciones, Empleado, Individuo, TipoContratacion} from "../../Interfaces/Interfaces";
 import {RouterLink, RouterLinkActive, RouterOutlet} from "@angular/router";
+import {CargoService} from "../../../services/cargoService/cargo.service";
+import {EmpleadoService} from "../../../services/empleadoService/empleado.service";
+import {ContratacionService} from "../../../services/contratacionService/contratacion.service";
 
 
 @Component({
@@ -18,11 +21,17 @@ import {RouterLink, RouterLinkActive, RouterOutlet} from "@angular/router";
 
 export class LandingPageComponent {
 
-  constructor(private tipoContratacionService: TipoContratacionService, private viewSrv: ViewService) {}
+  constructor(private tipoContratacionService: TipoContratacionService,
+              private viewSrv: ViewService,
+              private cargoSrv: CargoService,
+              private empleadoSrv: EmpleadoService,
+              private contratoSrv: ContratacionService) {}
 
   viewDatos:Empleado[] =[];
-  contratraciones: TipoContratacion[]=[];
-  contratracionesSend: TipoContratacion[]=[];
+  contratraciones: Contrataciones[]=[];
+  contratracionesSend: Contrataciones={idContratacion: 0, idDepartamento:0, idEmpleado:0, idCargo:0, idTipoContratacion:0,fechaContratacion:"",salario:0,estado:false,};
+  individuo: Individuo={idEmpleado:0,numeroDui:'',nombrePersona:'',usuario:'',numeroTelefono:'', correoInstitucional:'',fechaNacimiento:''}
+
   ngOnInit(): void {
     // this.getTipoContrataciones();
     this.getViewDatos();

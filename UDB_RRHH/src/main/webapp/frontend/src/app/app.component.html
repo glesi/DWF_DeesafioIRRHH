@@ -1,2 +1,24 @@
+<div class="navbar">
+  <div class="logo">
+    <img src="https://www.udb.edu.sv/editorial/images/Logo%20UDB%20letras%20blancas%20transparente.png" alt="Logo">
+    <a href="#" style="color: white; text-decoration: none;">UDB HR Manager System</a>
+  </div>
+  <div class="menu">
+    <a routerLink="/landing-page" routerLinkActive="active">Edit Employees</a>
+    <a routerLink="/crud-tipo-contrataciones" routerLinkActive="active">Edit Contrataciones</a>
+    <a routerLink="./crud-departamentos" routerLinkActive="active" >Edit Departamentos</a>
+    <a routerLink="/crud-cargo" routerLinkActive="active">Edit Cargos</a>
+    <!--    <a href="#">Bajas</a>-->
+    <!--    <a href="#">Cambios</a>-->
+    <!--    <a href="#">Consultas</a>-->
+  </div>
+  <div class="menu-toggle" onclick="toggleMenu()">
+    <div></div>
+    <div></div>
+    <div></div>
+
+  </div>
+</div>
+
 <router-outlet></router-outlet>
 

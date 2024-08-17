@@ -38,3 +38,13 @@ export interface Contrataciones {
   salario: number;
   estado: boolean;
 }
+
+export interface Individuo {
+  idEmpleado: number;
+  numeroDui: string;
+  nombrePersona: string;
+  usuario: string;
+  numeroTelefono: string;
+  correoInstitucional: string;
+  fechaNacimiento: string;
+}
