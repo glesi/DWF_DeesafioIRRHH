@@ -16,6 +16,7 @@ import java.io.PrintWriter;
 import java.util.List;
 import java.util.stream.Collectors;
 
+//@WebServlet(name = "ViewController", urlPatterns = {"/vista/*"})
 //Servlet que maneja el CRUD de la Tabla View
 public class ViewController extends HttpServlet {
 
@@ -24,7 +25,7 @@ public class ViewController extends HttpServlet {
 
 
     //Función que manda la vista de los objetos
-    protected void listViewController(HttpServletResponse response) {
+    protected void listView(HttpServletResponse response) {
         //Se obtiene del servicio la lista
         List<View> viewList = services.getViews();
         /*
@@ -44,20 +45,80 @@ public class ViewController extends HttpServlet {
             throw new RuntimeException(e);
         }
     }
-
+    //Función que recibe las peticiones GET
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        processRequest(request, response);
+    }
     //Función que procesa las peticiones en general
-    protected void processRequest(HttpServletResponse response) {
+    protected void processRequest(HttpServletRequest request, HttpServletResponse response)
+        throws ServletException, IOException {
         //Se inserta los headers necesarios para evitar error CORS
         response.setHeader("Access-Control-Allow-Origin", "*");
         response.setHeader("Access-Control-Allow-Methods", "*");
         response.setHeader("Access-Control-Allow-Headers", "*");
         //Llama la función para proveer la vista de los objetos
-        listViewController(response);
+        String method = request.getMethod();
+        String action = request.getParameter("accion");
+        if (method.equals("GET")) {
+            processGetRequest(request,response);
+        } else {
+            response.sendError(HttpServletResponse.SC_METHOD_NOT_ALLOWED,"Metodo no soportado");
+        }
+//        listViewController(response);
     }
 
-    //Función que recibe las peticiones GET
+    private void processGetRequest(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        String pathInfo = request.getPathInfo();
+        if (pathInfo == null || pathInfo.equals("/")) {
+            listView(response);
+        }else{
+            try{
+                Integer id = extractIdFromPathInfo(pathInfo);
+                getViewById(id, response);
+            }catch (NumberFormatException e){
+                response.sendError(HttpServletResponse.SC_BAD_REQUEST,"Id invalido"+e.getMessage());
+            }
+        }
+    }
+    private void getViewById(Integer id, HttpServletResponse response)
+            throws IOException {
+        View view = services.getViewById(id);
+        System.out.println("imprimiendo "+view);
+        if (view != null) {
+            PrintWriter out = response.getWriter();
+            response.setContentType("application/json");
+            response.setCharacterEncoding("UTF-8");
+            out.println(new JSONObject(view));
+            out.flush();
+        } else {
+            response.sendError(HttpServletResponse.SC_NOT_FOUND,"Empleado not found in view");
+        }
+    }
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) {
-        processRequest(response);
+    protected void doOptions(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        setAccessControlHeaders(response);
+        response.setStatus(HttpServletResponse.SC_OK);
+    }
+
+    private Integer extractIdFromPathInfo(String pathInfo) throws ServletException {
+        if (pathInfo == null || pathInfo.equals("/")) {
+            throw new ServletException("Ruta invalida.");
+        }
+        try {
+            return Integer.parseInt(pathInfo.substring(1));  // Extrae el ID de la URL
+        } catch (NumberFormatException e) {
+            throw new ServletException("ID inválido");
+        }
+    }
+
+    private void setAccessControlHeaders(HttpServletResponse response) {
+        response.setHeader("Access-Control-Allow-Origin", "*");
+        response.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+        response.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
+        response.setHeader("Access-Control-Max-Age", "3600");
     }
 }
