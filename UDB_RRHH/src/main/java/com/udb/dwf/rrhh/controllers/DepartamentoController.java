@@ -166,24 +166,7 @@ public class DepartamentoController extends HttpServlet {
     }
     // Método que inserta un nuevo departamento
     private void insertDepartamento(Departamento object,HttpServletRequest request, HttpServletResponse response) throws IOException {
-//        StringBuilder buffer = new StringBuilder();
-//        BufferedReader reader = request.getReader();
-//        String line;
-//        while ((line = reader.readLine()) != null) {
-//            buffer.append(line);
-//        }
-//        String data = buffer.toString();
-//
-//        JSONObject jsonObject = new JSONObject(data);
-//        String nombreDepartamento = jsonObject.getString("nombreDepartamento");
-//        String descripcionDepartamento = jsonObject.getString("descripcionDepartamento");
-//
-//        Departamento departamento = new Departamento();
-//        departamento.setNombreDepartamento(nombreDepartamento);
-//        departamento.setDescripcionDepartamento(descripcionDepartamento);
-
         departamentoServices.agregarDepartamento(object);
-
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
         response.getWriter().write("{\"message\": \"Departamento creado exitosamente\"}");
