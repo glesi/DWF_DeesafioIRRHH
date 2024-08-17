@@ -1,5 +1,7 @@
 package com.udb.dwf.rrhh.controllers;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.udb.dwf.rrhh.pojos.Cargo;
 import com.udb.dwf.rrhh.services.CargosServices;
 import jakarta.servlet.ServletException;
@@ -14,11 +16,14 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @WebServlet(name = "CargoController", urlPatterns = {"/cargo/*"})
 public class CargoController extends HttpServlet {
     // Instancia del servicio para gestionar las operaciones relacionadas con 'Cargo'
     private final CargosServices cargoService = new CargosServices();
+
+    Gson gson = new GsonBuilder().create();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -42,15 +47,24 @@ public class CargoController extends HttpServlet {
 
         // Obtiene el método HTTP de la solicitud (GET, POST, etc.)
         String method = request.getMethod();
-        String action = request.getParameter("accion");
-
         // Verifica el método HTTP y procesa la solicitud en consecuencia
         if ("POST".equals(method)) {
+            //Se obtienen datos del body
+            String requestData = request.getReader().lines().collect(Collectors.joining());
+            //Transformar el body a JSON
+            JSONObject bodyJSON = new JSONObject(requestData);
+            //Se obtiene la accion a ejecutar
+            String action = bodyJSON.getString("accion");
+            //se obtiene el JSON a utilizar
+            String jsonString = bodyJSON.getJSONObject("json").toString();
+            //se convierte a un objeto del tipo Cargo
+            Cargo cargo = gson.fromJson(jsonString, Cargo.class);
             if (action == null) {
                 response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Acción no especificada");
                 return;
             }
-            processPostRequest(action, request, response);
+            //Se llamala funcion que maneja la peticion
+            processPostRequest(action, cargo,request, response);
         } else if ("GET".equals(method)) {
             processGetRequest(request, response);
         } else {
@@ -69,7 +83,7 @@ public class CargoController extends HttpServlet {
         }
     }
 
-    private void processPostRequest(String action, HttpServletRequest request, HttpServletResponse response)
+    private void processPostRequest(String action, Cargo object, HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         String pathInfo = request.getPathInfo();
 
@@ -81,10 +95,10 @@ public class CargoController extends HttpServlet {
 
         switch (action) {
             case "insertar":
-                insertCargo(request, response);
+                insertCargo(object,request, response);
                 break;
             case "actualizar":
-                updateCargo(id, request, response);
+                updateCargo(id,object, request, response);
                 break;
             case "eliminar":
                 if (id == null) {
@@ -138,46 +152,18 @@ public class CargoController extends HttpServlet {
         out.flush();
     }
 
-    private void insertCargo(HttpServletRequest request, HttpServletResponse response)
+    private void insertCargo(Cargo object, HttpServletRequest request, HttpServletResponse response)
             throws IOException {
-        StringBuilder buffer = new StringBuilder();
-        BufferedReader reader = request.getReader();
-        String line;
-        while ((line = reader.readLine()) != null) {
-            buffer.append(line);
-        }
-        String data = buffer.toString();
-
-        JSONObject jsonObject = new JSONObject(data);
-        String cargoStr = jsonObject.getString("cargo");
-        String descripcionCargoStr = jsonObject.getString("descripcionCargo");
-        boolean jefatura = jsonObject.getBoolean("jefatura");
-
-        Cargo newCargo = new Cargo(0, cargoStr, descripcionCargoStr, jefatura);
-        cargoService.crearCargo(newCargo);
+        cargoService.crearCargo(object);
 
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
         response.getWriter().write("{\"message\": \"Cargo creado exitosamente\"}");
     }
 
-    private void updateCargo(int id, HttpServletRequest request, HttpServletResponse response)
+    private void updateCargo(int id, Cargo object, HttpServletRequest request, HttpServletResponse response)
             throws IOException {
-        StringBuilder buffer = new StringBuilder();
-        BufferedReader reader = request.getReader();
-        String line;
-        while ((line = reader.readLine()) != null) {
-            buffer.append(line);
-        }
-        String data = buffer.toString();
-
-        JSONObject jsonObject = new JSONObject(data);
-        String cargoStr = jsonObject.getString("cargo");
-        String descripcionCargoStr = jsonObject.getString("descripcionCargo");
-        boolean jefatura = jsonObject.getBoolean("jefatura");
-
-        Cargo cargo = new Cargo(id, cargoStr, descripcionCargoStr, jefatura);
-        cargoService.actualizarCargo(cargo);
+        cargoService.actualizarCargo(object);
 
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");

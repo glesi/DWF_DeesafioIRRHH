@@ -21,7 +21,7 @@ export class CRUDDepartamentosComponent {
   departamentos: Departamento[]=[];
   //Declaracion de objeto para enviar solicitudes por POST
   departamentoSend: Departamento={idDepartamento:0, nombreDepartamento:'',descripcionDepartamento:''};
-  path : string = '/';
+  path : string = '';
 
 
   constructor(private departamentoSrv : DepartamentoService) {}
