@@ -19,7 +19,8 @@ export class CRUDTipoContratacionesComponent {
   contratraciones: TipoContratacion[]=[];
   //Declaracion de objeto para enviar solicitudes por POST
   contratracionesSend: TipoContratacion={idTipoContratacion:0, tipoContratacion:''};
-  path : string = '';
+
+  path : string = '/';
   allDisabled = false;
 
   constructor(private tipoContratacionesSrv : TipoContratacionService) {}
@@ -28,10 +29,16 @@ export class CRUDTipoContratacionesComponent {
     this.getTipoContrataciones();
   }
 
-  getTipoContrataciones() {
-    if(this.contratracionesSend.idTipoContratacion>0){
-      this.path='/'+this.contratracionesSend.idTipoContratacion;
+  assignPath(){
+    if (this.contratracionesSend.idTipoContratacion > 0){
+      this.path = '/'+this.contratracionesSend.idTipoContratacion;
     }
+  }
+
+  getTipoContrataciones() {
+    // if(this.contratracionesSend.idTipoContratacion>0){
+    //   this.path='/'+this.contratracionesSend.idTipoContratacion;
+    // }
     this.tipoContratacionesSrv.get(this.path).subscribe({
       next: (result) => {
         this.contratraciones = result;
@@ -43,15 +50,26 @@ export class CRUDTipoContratacionesComponent {
     })
   }
 
+  getContratacionByID(){
+    this.tipoContratacionesSrv.get(this.path).subscribe({
+      next: (result) =>{
+        this.contratracionesSend = result;
+      },
+      error: (error) => {
+        console.log(error)
+      }
+    })
+  }
+
   saveTipoContrataciones() {
 
     var object = {
-      "action": "insertar",
+      "accion": "insertar",
       "json": this.contratracionesSend,
 
     }
     if(this.contratracionesSend.tipoContratacion.trim().length > 0){
-      this.tipoContratacionesSrv.post(object).subscribe({
+      this.tipoContratacionesSrv.post(this.path, object).subscribe({
         next: (result) => {
           Swal.fire({
             position: "center",
@@ -91,12 +109,12 @@ export class CRUDTipoContratacionesComponent {
   updateTipoContrataciones() {
     //Agregar objeto
     var object = {
-      "action": "actualizar",
+      "accion": "actualizar",
       "json": this.contratracionesSend,
     }
 
     if (this.contratracionesSend.tipoContratacion.trim().length > 0) {
-      this.tipoContratacionesSrv.post(object).subscribe({
+      this.tipoContratacionesSrv.post(this.path, object).subscribe({
         next: (result) => {
           Swal.fire({
             position: "center",
@@ -134,10 +152,10 @@ export class CRUDTipoContratacionesComponent {
   deleteTipoContrataciones() {
     //Agregar objeto
     var object = {
-      "action": "eliminar",
+      "accion": "eliminar",
       "json": this.contratracionesSend,
     }
-    this.tipoContratacionesSrv.post(object).subscribe({
+    this.tipoContratacionesSrv.post(this.path, object).subscribe({
       next: (result) => {
         Swal.fire({
           position: "center",
@@ -167,7 +185,8 @@ export class CRUDTipoContratacionesComponent {
   onCheckBoxChange(event: Event,idTipoContratacion:number ): void {
     const trg = event.target as HTMLInputElement;
       this.contratracionesSend.idTipoContratacion= idTipoContratacion;
-      this.getTipoContrataciones();
+      this.assignPath();
+      this.getContratacionByID();
       console.log(this.contratracionesSend.idTipoContratacion);
 
   }
