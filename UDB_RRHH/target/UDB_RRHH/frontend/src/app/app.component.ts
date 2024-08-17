@@ -1,6 +1,5 @@
 import { Component } from '@angular/core';
-import {RouterLink, RouterLinkActive, RouterOutlet} from '@angular/router';
-
+import { RouterOutlet, RouterLink, RouterLinkActive} from '@angular/router';
 
 
 @Component({

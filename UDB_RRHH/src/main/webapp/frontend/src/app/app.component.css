@@ -183,7 +183,7 @@ table.table .avatar {
   color: #b8b8b8;
   cursor: auto;
   box-shadow: none;
-  background: #ddd;
+  background: black;
 }
 /* Modal styles */
 .modal .modal-dialog {

@@ -174,17 +174,20 @@ table.table .avatar {
 }
 .custom-checkbox input[type="checkbox"]:checked + label:before {
   border-color: #03A9F4;
-  background: #03A9F4;
+  background: white;
 }
+
 .custom-checkbox input[type="checkbox"]:checked + label:after {
-  border-color: #fff;
+  border-color: #03A9F4;
 }
 .custom-checkbox input[type="checkbox"]:disabled + label:before {
-  color: #b8b8b8;
+  color: #03A9F4;
   cursor: auto;
   box-shadow: none;
   background: #ddd;
+
 }
+
 /* Modal styles */
 .modal .modal-dialog {
   max-width: 400px;

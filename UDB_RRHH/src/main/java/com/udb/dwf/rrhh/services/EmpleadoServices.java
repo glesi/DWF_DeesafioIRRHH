@@ -23,8 +23,8 @@ public class EmpleadoServices {
         return this.empleadoRepository.crearEmpleado(empleado);
     }
 
-    public Empleado actualizarEmpleado(Empleado empleado) {
-        return this.empleadoRepository.crearEmpleado(empleado);
+    public boolean actualizarEmpleado(Empleado empleado) {
+        return this.empleadoRepository.actualizarEmpleado(empleado);
     }
 
     public boolean eliminarEmpleado(int idEmpleado) {

@@ -1,5 +1,7 @@
 package com.udb.dwf.rrhh.controllers;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.udb.dwf.rrhh.pojos.Empleado;
 import com.udb.dwf.rrhh.services.EmpleadoServices;
 import jakarta.servlet.ServletException;
@@ -14,6 +16,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @WebServlet(name = "EmpleadosController", urlPatterns = {"/empleados/*"})
 //Servlet que maneja el CRUD de la Tabla TipoContratacion
@@ -21,6 +24,7 @@ public class EmpleadosController extends HttpServlet {
     //Instancia de la Clase de Servicios
     private final EmpleadoServices empleadoServices = new EmpleadoServices();
 
+    Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd") .create();
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -38,16 +42,26 @@ public class EmpleadosController extends HttpServlet {
         response.setHeader("Access-Control-Allow-Origin", "*");
         response.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
         response.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
-
+        //Se obtiene el método que se ocupará
         String method = request.getMethod();
-        String action = request.getParameter("accion");
-
+        //Realiza acciones dependiendo del metodo, POST o GET y da error si no se reconoce el metodo
         if ("POST".equals(method)) {
+            //Obtener datos del body de la peticion
+            String requestData = request.getReader().lines().collect(Collectors.joining());
+            //Transformar body a JSON
+            JSONObject bodyJson = new JSONObject(requestData);
+            //Obtener accion a realizar
+            String action = bodyJson.getString("accion");
+            //Se obtiene el JSON a usar
+            String jsonString = bodyJson.getJSONObject("json").toString();
+            //Se transforma el json a un objeto de tipo Empleado
+            Empleado object = gson.fromJson(jsonString, Empleado.class);
             if (action == null) {
                 response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Accion no especificada");
                 return;
             }
-            processPostRequest(action, request, response);
+            //Llamada a la funcion que procesa la peticion post
+            processPostRequest(action, object, request, response);
         } else if ("GET".equals(method)) {
             processGetRequest(request, response);
         } else {
@@ -66,7 +80,7 @@ public class EmpleadosController extends HttpServlet {
         }
     }
     // Método para procesar solicitudes POST
-    private void processPostRequest(String action, HttpServletRequest request, HttpServletResponse response)
+    private void processPostRequest(String action, Empleado object, HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         String pathInfo = request.getPathInfo();
 
@@ -78,10 +92,10 @@ public class EmpleadosController extends HttpServlet {
 
         switch (action) {
             case "insertar":
-                insertEmpleado(request, response);
+                insertEmpleado(object,request, response);
                 break;
             case "actualizar":
-                updateEmpleado(id, request, response);
+                updateEmpleado(id,object, request, response);
                 break;
             case "eliminar":
                 if (id == null) {
@@ -135,63 +149,25 @@ public class EmpleadosController extends HttpServlet {
         out.flush();
     }
     // Método que inserta un nuevo empleado
-    private void insertEmpleado(HttpServletRequest request, HttpServletResponse response)
+    private void insertEmpleado(Empleado object, HttpServletRequest request, HttpServletResponse response)
             throws IOException {
-        StringBuilder buffer = new StringBuilder();
-        BufferedReader reader = request.getReader();
-        String line;
-        while ((line = reader.readLine()) != null) {
-            buffer.append(line);
-        }
-        String data = buffer.toString();
-
-        JSONObject jsonObject = new JSONObject(data);
-        String nombre = jsonObject.getString("nombrePersona");
-        String usuario = jsonObject.getString("usuario");
-        String dui = jsonObject.getString("numeroDui");
-        String telefono = jsonObject.getString("numeroTelefono");
-        String correo = jsonObject.getString("correoInstitucional");
-        String fechaNacimiento = jsonObject.getString("fechaNacimiento");
-
-        Empleado newEmpleado = new Empleado(0, dui, nombre, usuario, telefono, correo, java.sql.Date.valueOf(fechaNacimiento));
-        empleadoServices.agregarEmpleado(newEmpleado);
+        empleadoServices.agregarEmpleado(object);
 
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
         response.getWriter().write("{\"message\": \"Empleado creado exitosamente\"}");
     }
     //Metodo que actualza un nuevo empleado
-    private void updateEmpleado(int id, HttpServletRequest request, HttpServletResponse response)
+    private void updateEmpleado(int id, Empleado object, HttpServletRequest request, HttpServletResponse response)
             throws IOException {
-        String pathInfo = request.getPathInfo();
-        if (pathInfo != null && pathInfo.length() > 1) {
-
-            StringBuilder buffer = new StringBuilder();
-            BufferedReader reader = request.getReader();
-            String line;
-            while ((line = reader.readLine()) != null) {
-                buffer.append(line);
-            }
-            String data = buffer.toString();
-
-            JSONObject jsonObject = new JSONObject(data);
-            String nombre = jsonObject.getString("nombrePersona");
-            String usuario = jsonObject.getString("usuario");
-            String dui = jsonObject.getString("numeroDui");
-            String telefono = jsonObject.getString("numeroTelefono");
-            String correo = jsonObject.getString("correoInstitucional");
-            String fechaNacimiento = jsonObject.getString("fechaNacimiento");
-
-            // Crea un objeto Empleado con los datos proporcionados
-            Empleado empleado = new Empleado(id, dui, nombre, usuario, telefono, correo, java.sql.Date.valueOf(fechaNacimiento));
-            empleadoServices.actualizarEmpleado(empleado);
+            response.setHeader("Access-Control-Allow-Origin", "*");
+            response.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+            response.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
+            empleadoServices.actualizarEmpleado(object);
 
             response.setContentType("application/json");
             response.setCharacterEncoding("UTF-8");
             response.getWriter().write("{\"message\": \"Empleado actualizado exitosamente\"}");
-        } else {
-            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "ID no proporcionado");
-        }
     }
     // Método que elimina un empleado
     private void deleteEmpleado(int id, HttpServletRequest request, HttpServletResponse response)

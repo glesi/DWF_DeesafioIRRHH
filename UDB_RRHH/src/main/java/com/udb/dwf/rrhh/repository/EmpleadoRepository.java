@@ -111,6 +111,7 @@ public class EmpleadoRepository {
             preparedStatement.setString( 5, empleado.getNumeroTelefono());
             preparedStatement.setString( 6, empleado.getCorreoInstitucional());
             preparedStatement.setDate( 7, empleado.getFechaNacimiento());
+            preparedStatement.setInt( 8, empleado.getIdEmpleado());
 
             int affectedRows = preparedStatement.executeUpdate();
             return affectedRows > 0;
