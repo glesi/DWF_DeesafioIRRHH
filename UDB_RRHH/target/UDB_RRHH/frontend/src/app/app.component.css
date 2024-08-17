@@ -187,7 +187,7 @@ table.table .avatar {
 }
 /* Modal styles */
 .modal .modal-dialog {
-  max-width: 400px;
+  max-width: 600px;
 }
 .modal .modal-header, .modal .modal-body, .modal .modal-footer {
   padding: 20px 30px;

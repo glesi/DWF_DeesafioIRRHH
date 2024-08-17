@@ -106,7 +106,7 @@
       <div class="modal-content">
         <form (ngSubmit)="updateDepartamento()">
           <div class="modal-header">
-            <h4 class="modal-title">Edit Departamento</h4>
+            <h4 class="modal-title">Edit: {{departamentoSend.nombreDepartamento}}</h4>
             <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
           </div>
           <div class="modal-body">
@@ -117,13 +117,13 @@
                      class="form-control"
                      required
                      [(ngModel)]="departamentoSend.nombreDepartamento"
-                     name="contratracionesSend">
+                     name="departamento-edit">
               <label>Descripcion</label>
               <input type="text"
                      class="form-control"
                      required
                      [(ngModel)]="departamentoSend.descripcionDepartamento"
-                     name="contratracionesSend">
+                     name="descripcion-edit">
             </div>
           </div>
           <div class="modal-footer">

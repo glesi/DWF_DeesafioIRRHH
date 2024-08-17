@@ -2,7 +2,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <meta http-equiv="refresh" content="0;URL='tipoContrataciones'" />
+    <meta http-equiv="refresh" content="0;URL='tipoContratacion'" />
     <title>Redirection</title>
 </head>
 <body>

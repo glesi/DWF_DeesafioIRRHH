@@ -26,7 +26,7 @@ export class LandingPageComponent {
   contratraciones: TipoContratacion[]=[];
   contratracionesSend: TipoContratacion[]=[];
   ngOnInit(): void {
-    this.getTipoContrataciones();
+    // this.getTipoContrataciones();
     this.getViewDatos();
   }
 
@@ -38,17 +38,17 @@ export class LandingPageComponent {
     "accion": "insertar"
   };
 
-  getTipoContrataciones() {
-    this.tipoContratacionService.get().subscribe({
-      next: (result) => {
-        this.contratraciones = result;
-        console.log(result)
-      },
-      error: (error) => {
-        console.log(error)
-      }
-    })
-  }
+  // getTipoContrataciones() {
+  //   this.tipoContratacionService.get().subscribe({
+  //     next: (result) => {
+  //       this.contratraciones = result;
+  //       console.log(result)
+  //     },
+  //     error: (error) => {
+  //       console.log(error)
+  //     }
+  //   })
+  // }
 
   saveTipoContrataciones() {
     this.tipoContratacionService.post(this.object).subscribe({

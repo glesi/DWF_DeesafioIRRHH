@@ -5,6 +5,7 @@ import com.google.gson.GsonBuilder;
 import com.udb.dwf.rrhh.pojos.TipoContratacion;
 import com.udb.dwf.rrhh.services.TipoContratacionesServices;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -16,6 +17,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 //Servlet que maneja el CRUD de la Tabla TipoContratacion
+@WebServlet(name = "TipoContratacionController", urlPatterns = {"/tipoContratacion/*"})
 public class TipoContratacionController extends HttpServlet {
 
     //Creador GSON para crear objetos desde un JSON
