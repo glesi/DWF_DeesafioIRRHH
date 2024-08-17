@@ -7,7 +7,7 @@ import { Observable } from 'rxjs';
 })
 export class DepartamentoService {
 
-  API_URL : string = 'http://localhost:8080/UDB_RRHH/departamento';
+  API_URL : string = 'http://localhost:8080/UDB_RRHH/departamento/';
 
   constructor(private httpClient : HttpClient) { }
 

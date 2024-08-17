@@ -92,11 +92,12 @@ public class DepartamentoRepository {
 
         try {
             connection = Conexion.getConexion();
-            String query = "UPDATE Departamento SET idDepartamento,nombreDepartamento,descripcionDepartamento = ?, WHERE idepartamento = ?";
+            String query = "UPDATE Departamento SET idDepartamento =?,nombreDepartamento=?,descripcionDepartamento = ? WHERE idDepartamento = ?";
             preparedStatement = connection.prepareStatement(query);
             preparedStatement.setInt(1, departamento.getIdDepartamento());
             preparedStatement.setString(2, departamento.getNombreDepartamento());
             preparedStatement.setString( 3, departamento.getDescripcionDepartamento());
+            preparedStatement.setInt( 4, departamento.getIdDepartamento());
 
             int affectedRows = preparedStatement.executeUpdate();
             return affectedRows > 0;

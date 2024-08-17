@@ -139,7 +139,7 @@ export class CRUDDepartamentosComponent {
             showConfirmButton: false,
             timer: 1500
           })
-          console.log(error)
+          console.log("No se pudo porque "+ JSON.stringify(error) )
         }
       })
     } else {
