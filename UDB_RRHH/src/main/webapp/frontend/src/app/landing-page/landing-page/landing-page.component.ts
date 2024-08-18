@@ -163,7 +163,8 @@ export class LandingPageComponent {
       next: (result)=>{
         console.log("Empleado guardado exitosamente: "+result);
 
-        this.contratoSend.idEmpleado=result.idEmpleado;
+        this.contratoSend.idEmpleado=this.individuo.idEmpleado;
+        console.log("id empleado"+this.contratoSend.idEmpleado)
         this.saveContrato();
       },
       error: (error) => {
@@ -177,6 +178,7 @@ export class LandingPageComponent {
       "accion": "insertar",
       "json": this.contratoSend,
     }
+    console.log(this.contratoSend.idEmpleado);
     this.contratoSrv.post(this.path,object).subscribe({
       next: (result)=>{
         Swal.fire({
@@ -192,7 +194,8 @@ export class LandingPageComponent {
       }
     });
   }
-
+//Funcion para eliminar registros de dos tablas, empleados y contrataciones
+//usa un stored procedure en el backend
   deleteBoth(){
     var object ={
       "accion": "eliminar",
