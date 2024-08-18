@@ -37,7 +37,7 @@
         <td>{{dato.fechaNacimiento}}</td>
         <td>
           <a href="#editEmployeeModal" class="edit" data-toggle="modal" (click)="onCheckBoxChange($event,dato.idEmpleado)"><i class="material-icons" data-toggle="tooltip" title="Edit">&#xE254;</i></a>
-          <a href="#deleteEmployeeModal" class="delete" data-toggle="modal"><i class="material-icons" data-toggle="tooltip" title="Delete">&#xE872;</i></a>
+          <a href="#deleteEmployeeModal" class="delete" data-toggle="modal" (click)="onCheckBoxChange($event,dato.idEmpleado)"><i class="material-icons" data-toggle="tooltip" title="Delete">&#xE872;</i></a>
         </td>
       </tr>
       </tbody>
@@ -89,8 +89,7 @@
                      required
                      id="Usuario"
                      [(ngModel)]="individuo.usuario"
-                     name="user-send"
-                    >
+                     name="user-send">
             </div>
             <div class="form-group">
               <label>Telefono</label>
@@ -120,15 +119,19 @@
               <label>Fecha De Contratacion</label>
               <input type="date" class="form-control"
                      required
-                     id="cont">
+                     id="cont"
+                     [(ngModel)]="contratoSend.fechaContratacion"
+                     name="contratacionDate-send">
             </div>
             <div class="form-group">
               <label for="cargoSelect">Cargo</label>
               <select class="form-control"
                       required
-                      id="cargoSelect">
+                      id="cargoSelect"
+                      [(ngModel)]="contratoSend.idCargo"
+                      name="idCargo-send">
                 <option value="">Selecciona un valor</option>
-                <option *ngFor="let cargo of todosLosCargos">{{cargo.cargo}}</option>
+                <option *ngFor="let cargo of todosLosCargos" [value]="cargo.idCargo">{{cargo.cargo}}</option>
 
               </select>
             </div>
@@ -136,10 +139,22 @@
               <label for="contratacionSelect">Tipo de Contratacion</label>
               <select class="form-control"
                       id="contratacionSelect"
-                      required>
-<!--                <option *ngFor="let tipo of todosLosTipos">{{tipo.tipoContratacion}}</option>-->
+                      required
+                      [(ngModel)]="contratoSend.idTipoContratacion"
+                      name="idCargo-send">
                 <option value="">Selecciona un valor</option>
-                <option *ngFor="let tipo of todosLosTipos">{{tipo.tipoContratacion}}</option>
+                <option *ngFor="let tipo of todosLosTipos" [value]="tipo.idTipoContratacion">{{tipo.tipoContratacion}}</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="contratacionSelect">Departamento</label>
+              <select class="form-control"
+                      id="DepartamentoSelect"
+                      required
+                      [(ngModel)]="contratoSend.idDepartamento"
+                      name="dpto-send">
+                <option value="">Selecciona un valor</option>
+                <option *ngFor="let dpto of departamentos" [value]="dpto.idDepartamento">{{dpto.nombreDepartamento}}</option>
               </select>
             </div>
             <div class="form-group">
@@ -148,7 +163,9 @@
                      required
                      id="salario"
                      pattern="^\d+(\.\d{1,2})?$"
-                     placeholder="0.00">
+                     placeholder="0.00"
+                     [(ngModel)]="contratoSend.salario"
+                     name="salario-send">
             </div>
           </div>
           <div class="modal-footer">
@@ -213,7 +230,10 @@
           </div>
           <div class="modal-footer">
             <input type="button" class="btn btn-default" data-dismiss="modal" value="Cancel">
-            <input type="submit" class="btn btn-danger" value="Delete">
+            <input type="submit"
+                   class="btn btn-danger"
+                   value="Delete"
+                   (click)="deleteBoth()">
           </div>
         </form>
       </div>
