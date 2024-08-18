@@ -69,7 +69,7 @@ public class ViewRepository {
                 }
 
             }catch (SQLException e) {
-                System.out.println("Error al intentar ejecutar storeed procedure"+e.getMessage());
+                System.out.println("Error al intentar ejecutar stored procedure"+e.getMessage());
             }
         }finally {
             if (con != null) Conexion.desconectar();
@@ -77,4 +77,24 @@ public class ViewRepository {
         return viewObj;
 
     }
+
+    public boolean eliminaViewElements(int idEmpleado){
+        Connection con = null;
+
+        try{
+            con = Conexion.getConexion();
+            String query = "{call deleteContratacionAndEmpleadoByIdEmpleado(?)}";
+            try (CallableStatement sp = con.prepareCall(query)){
+                sp.setInt(1, idEmpleado);
+                int affectedRows = sp.executeUpdate();
+                    return affectedRows>0;
+                }catch (SQLException e){
+                    System.out.println("Error al intentar eliminar registro: "+idEmpleado+e.getMessage());
+                    return false;
+                }
+        }finally{
+            if (con != null) Conexion.desconectar();
+        }
+        }
+
 }

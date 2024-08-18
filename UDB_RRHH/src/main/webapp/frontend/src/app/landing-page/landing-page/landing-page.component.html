@@ -26,7 +26,7 @@
       </tr>
       </thead>
       <tbody>
-      <tr  *ngFor="let dato of viewDatos; let i=index" [id]="'tablaEmpleados+i'">
+      <tr  *ngFor="let dato of viewDatos; let i=index" id="tablaEmpleados">
         <td>{{dato.idEmpleado}}</td>
         <td>{{dato.numeroDui}}</td>
         <td>{{dato.nombrePersona}}</td>
@@ -36,30 +36,30 @@
         <td>{{dato.salario}}</td>
         <td>{{dato.fechaNacimiento}}</td>
         <td>
-          <a href="#editEmployeeModal" class="edit" data-toggle="modal"><i class="material-icons" data-toggle="tooltip" title="Edit">&#xE254;</i></a>
+          <a href="#editEmployeeModal" class="edit" data-toggle="modal" (click)="onCheckBoxChange($event,dato.idEmpleado)"><i class="material-icons" data-toggle="tooltip" title="Edit">&#xE254;</i></a>
           <a href="#deleteEmployeeModal" class="delete" data-toggle="modal"><i class="material-icons" data-toggle="tooltip" title="Delete">&#xE872;</i></a>
         </td>
       </tr>
       </tbody>
     </table>
-    <div class="clearfix">
-      <div class="hint-text">Showing <b>5</b> out of <b>25</b> entries</div>
-      <ul class="pagination">
-        <li class="page-item disabled"><a href="#">Previous</a></li>
-        <li class="page-item"><a href="#" class="page-link">1</a></li>
-        <li class="page-item"><a href="#" class="page-link">2</a></li>
-        <li class="page-item active"><a href="#" class="page-link">3</a></li>
-        <li class="page-item"><a href="#" class="page-link">4</a></li>
-        <li class="page-item"><a href="#" class="page-link">5</a></li>
-        <li class="page-item"><a href="#" class="page-link">Next</a></li>
-      </ul>
-    </div>
-  </div>
-  <!-- Edit Modal HTML -->
+<!--    <div class="clearfix">-->
+<!--      <div class="hint-text">Showing <b>5</b> out of <b>25</b> entries</div>-->
+<!--      <ul class="pagination">-->
+<!--        <li class="page-item disabled"><a href="#">Previous</a></li>-->
+<!--        <li class="page-item"><a href="#" class="page-link">1</a></li>-->
+<!--        <li class="page-item"><a href="#" class="page-link">2</a></li>-->
+<!--        <li class="page-item active"><a href="#" class="page-link">3</a></li>-->
+<!--        <li class="page-item"><a href="#" class="page-link">4</a></li>-->
+<!--        <li class="page-item"><a href="#" class="page-link">5</a></li>-->
+<!--        <li class="page-item"><a href="#" class="page-link">Next</a></li>-->
+<!--      </ul>-->
+<!--    </div>-->
+<!--  </div>-->
+  <!-- Add Modal HTML -->
   <div id="addEmployeeModal" class="modal fade">
     <div class="modal-dialog">
       <div class="modal-content">
-        <form>
+        <form (ngSubmit)="saveEmpleado()">
           <div class="modal-header">
             <h4 class="modal-title">Agregar Empleado</h4>
             <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
@@ -70,38 +70,51 @@
               <input type="text" class="form-control"
                      id="dui"
                      required
-                     pattern="\d{7}-\d"
-                     placeholder="00000000-0">
+                     pattern="\d{9}"
+                     placeholder="00000000-0"
+                     [(ngModel)]="individuo.numeroDui"
+                     name="dui-send">
             </div>
             <div class="form-group">
               <label>Nombre</label>
               <input type="text" class="form-control"
                      required
-                     id="Nombre">
+                     id="Nombre"
+                     [(ngModel)]="individuo.nombrePersona"
+                     name="nombre-send">
             </div>
             <div class="form-group">
               <label>Usuario</label>
               <input class="form-control"
                      required
-                     id="Usuario">
+                     id="Usuario"
+                     [(ngModel)]="individuo.usuario"
+                     name="user-send"
+                    >
             </div>
             <div class="form-group">
               <label>Telefono</label>
               <input type="tel" class="form-control"
                      required
-                     id="telefono">
+                     id="telefono"
+                     [(ngModel)]="individuo.numeroTelefono"
+                     name="phone-send">
             </div>
             <div class="form-group">
               <label>Correo</label>
               <input type="email" class="form-control"
                      required
-                     id="correo">
+                     id="correo"
+                     [(ngModel)]="individuo.correoInstitucional"
+                     name="email-send">
             </div>
             <div class="form-group">
               <label>Fecha De Nacimiento</label>
               <input type="date" class="form-control"
                      required
-                     id="nac">
+                     id="nac"
+                     [(ngModel)]="individuo.fechaNacimiento"
+                     name="bday-send">
             </div>
             <div class="form-group">
               <label>Fecha De Contratacion</label>
@@ -115,11 +128,8 @@
                       required
                       id="cargoSelect">
                 <option value="">Selecciona un valor</option>
-                <option value="gerente">Gerente</option>
-                <option value="supervisor">Supervisor</option>
-                <option value="docente">Docente</option>
-                <option value="asistente">Asistente de Decanato</option>
-                <option value="laboratorista">Laboratorista</option>
+                <option *ngFor="let cargo of todosLosCargos">{{cargo.cargo}}</option>
+
               </select>
             </div>
             <div class="form-group">
@@ -127,9 +137,9 @@
               <select class="form-control"
                       id="contratacionSelect"
                       required>
+<!--                <option *ngFor="let tipo of todosLosTipos">{{tipo.tipoContratacion}}</option>-->
                 <option value="">Selecciona un valor</option>
-                <option *ngFor="let contratacion of contratraciones">{{contratacion.tipoContratacion}}</option>
-                <!--              <option value="prof">Por servicios profesionales</option>-->
+                <option *ngFor="let tipo of todosLosTipos">{{tipo.tipoContratacion}}</option>
               </select>
             </div>
             <div class="form-group">
@@ -214,3 +224,4 @@
 
 
   <router-outlet></router-outlet>
+</div>
