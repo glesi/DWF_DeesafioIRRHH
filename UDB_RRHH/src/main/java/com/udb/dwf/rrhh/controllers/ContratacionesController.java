@@ -1,5 +1,7 @@
 package com.udb.dwf.rrhh.controllers;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.udb.dwf.rrhh.pojos.Contrataciones;
 import com.udb.dwf.rrhh.services.ContratacionesServices;
 import jakarta.servlet.ServletException;
@@ -16,6 +18,7 @@ import java.io.PrintWriter;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.List;
+import java.util.stream.Collectors;
 
 //Servlet que maneja el CRUD de la Tabla Contrataciones
 @WebServlet(name = "ContratacionesController", urlPatterns = {"/contrataciones/*"})
@@ -24,6 +27,8 @@ public class ContratacionesController extends HttpServlet {
     //Instancia de la Clase de Servicios de la Tabla Contrataciones
     private final ContratacionesServices contratacionesService = new ContratacionesServices();
 
+    //Creacion de gson capaz de serializar la fecha.
+    Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd").create();
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -49,16 +54,25 @@ public class ContratacionesController extends HttpServlet {
         response.setHeader("Access-Control-Allow-Origin", "*");
         response.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
         response.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
-
+        //Se obtiene el metodo de la peticion
         String method = request.getMethod();
-        String action = request.getParameter("accion");
-
+        //verifica el metodo para procesar la peticion
         if ("POST".equals(method)) {
+            //Obtener los datos del body de la request
+            String requestData = request.getReader().lines().collect(Collectors.joining());
+            //Transformar el body a JSON
+            JSONObject bodyJSON = new JSONObject(requestData);
+            //Obtener la accion a ejecutar
+            String action = bodyJSON.getString("accion");
+            //Obtencion del JSON con la informacion de la contratacion
+            String jsonString = bodyJSON.getJSONObject("json").toString();
+            //Creacion del objeto de tipo Contrataciones
+            Contrataciones object = gson.fromJson(jsonString, Contrataciones.class);
             if (action == null) {
                 response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Accion no especificada");
                 return;
             }
-            processPostRequest(action, request, response);
+            processPostRequest(action, object, request, response);
         } else if ("GET".equals(method)) {
             processGetRequest(request, response);
         } else {
@@ -77,7 +91,7 @@ public class ContratacionesController extends HttpServlet {
         }
     }
     // Método para procesar solicitudes POST
-    private void processPostRequest(String action, HttpServletRequest request, HttpServletResponse response)
+    private void processPostRequest(String action, Contrataciones object, HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException, ParseException {
         String pathInfo = request.getPathInfo();
 
@@ -89,7 +103,7 @@ public class ContratacionesController extends HttpServlet {
 
         switch (action) {
             case "insertar":
-                insertContratacion(request, response);
+                insertContratacion(object,request, response);
                 break;
             case "actualizar":
                 if (id == null) {
@@ -98,7 +112,7 @@ public class ContratacionesController extends HttpServlet {
                 }
 
                 // Llama al método para actualizar la contratación con el ID proporcionado
-                updateContratacion(id, request, response);
+                updateContratacion(id,object, request, response);
                 break;
             case "eliminar":
                 if (id == null) {
@@ -155,68 +169,26 @@ public class ContratacionesController extends HttpServlet {
         out.flush();
     }
     // Método que inserta una nueva Contratacion
-    private void insertContratacion(HttpServletRequest request, HttpServletResponse response)
+    private void insertContratacion(Contrataciones object, HttpServletRequest request, HttpServletResponse response)
             throws IOException, ParseException {
-        StringBuilder buffer = new StringBuilder();
-        BufferedReader reader = request.getReader();
-        String line;
-        while ((line = reader.readLine()) != null) {
-            buffer.append(line);
-        }
-        String data = buffer.toString();
-
-        JSONObject jsonObject = new JSONObject(data);
-
-        Contrataciones nuevaContratacion = new Contrataciones(
-                jsonObject.getInt("idDepartamento"),
-                jsonObject.getInt("idEmpleado"),
-                jsonObject.getInt("idCargo"),
-                jsonObject.getInt("idTipoContratacion"),
-                obtieneFechaFormateada(jsonObject.getString("fechaContratacion")),
-                jsonObject.getDouble("salario"),
-                jsonObject.getBoolean("estado")
-        );
-
-        contratacionesService.crearContratacion(nuevaContratacion);
+        contratacionesService.crearContratacion(object);
 
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
         response.getWriter().write("{\"message\": \"Contratación creada exitosamente\"}");
     }
     // Método que actualiza una nueva Contratacion
-    private void updateContratacion(int id, HttpServletRequest request, HttpServletResponse response)
+    private void updateContratacion(int id, Contrataciones object, HttpServletRequest request, HttpServletResponse response)
             throws IOException, ParseException {
-        String pathInfo = request.getPathInfo();
-        if (pathInfo != null && pathInfo.length() > 1) {
-
-            StringBuilder buffer = new StringBuilder();
-            BufferedReader reader = request.getReader();
-            String line;
-            while ((line = reader.readLine()) != null) {
-                buffer.append(line);
-            }
-            String data = buffer.toString();
-
-            JSONObject jsonObject = new JSONObject(data);
-            Contrataciones contratacion = new Contrataciones(
-                    id,
-                    jsonObject.getInt("idDepartamento"),
-                    jsonObject.getInt("idEmpleado"),
-                    jsonObject.getInt("idCargo"),
-                    jsonObject.getInt("idTipoContratacion"),
-                    obtieneFechaFormateada(jsonObject.getString("fechaContratacion")),
-                    jsonObject.getDouble("salario"),
-                    jsonObject.getBoolean("estado")
-            );
-
-            contratacionesService.actualizarContratacion(contratacion);
+        response.setHeader("Access-Control-Allow-Origin", "*");
+        response.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+        response.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
+            contratacionesService.actualizarContratacion(object);
 
             response.setContentType("application/json");
             response.setCharacterEncoding("UTF-8");
             response.getWriter().write("{\"message\": \"Contratación actualizada exitosamente\"}");
-        } else {
-            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "ID no proporcionado");
-        }
+
     }
 
     private java.sql.Date obtieneFechaFormateada(String fecha) throws ParseException {

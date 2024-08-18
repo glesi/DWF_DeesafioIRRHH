@@ -7,7 +7,7 @@ import { Observable } from 'rxjs';
 })
 export class ViewService {
 
-  API_URL : string = 'http://localhost:8080/UDB_RRHH/vista';
+  API_URL : string = 'http://localhost:8080/UDB_RRHH/vista/';
 
   constructor(private httpClient : HttpClient) { }
 
@@ -15,7 +15,7 @@ export class ViewService {
     return this.httpClient.get(this.API_URL+path).pipe(res => res);
   }
 
-  post(object : any): Observable<any> {
+  post(path: string,object : any): Observable<any> {
     return this.httpClient.post(this.API_URL, object).pipe(res => res);
   }
 
