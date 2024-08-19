@@ -11,7 +11,7 @@ import Swal from "sweetalert2";
 import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 import {DepartamentoService} from "../../../services/departamentoService/departamento.service";
 import { formatDate } from '@angular/common';
-import {lastValueFrom, switchMap} from "rxjs";
+import {lastValueFrom, max, switchMap} from "rxjs";
 import {get} from "node:http";
 
 
@@ -41,7 +41,8 @@ export class LandingPageComponent {
               ) {}
 
   viewDatos:Empleado[] =[];
-  view: Empleado={idEmpleado:0,numeroDui:'', nombrePersona:'', numeroTelefono:'',correoInstitucional:'',cargo:'', nombreDepartamento:'',fechaContratacion:new Date(),salario:0,fechaNacimiento: new Date(), tipoContratacion:''};
+  viewActive:Empleado[] =[];
+  view: Empleado={idEmpleado:0,numeroDui:'', nombrePersona:'', numeroTelefono:'',correoInstitucional:'',cargo:'', nombreDepartamento:'',fechaContratacion:new Date(),salario:0,fechaNacimiento: new Date(), tipoContratacion:'',estado:true};
   contratraciones: Contrataciones[]=[];
   contratoSend: Contrataciones={idContratacion: 0, idDepartamento:0, idEmpleado:0, idCargo:0, idTipoContratacion:0,fechaContratacion:"",salario:0,estado:true,};
   contratoAdd: Contrataciones={idContratacion: 0, idDepartamento:0, idEmpleado:0, idCargo:0, idTipoContratacion:0,fechaContratacion:"",salario:0,estado:true,};
@@ -59,6 +60,7 @@ export class LandingPageComponent {
   pathE :string = '';
   pathA: string= '';
   pathC: string='';
+  idBaja: number=0;
   ahora: Date = new Date();
 
   ngOnInit(): void {
@@ -69,6 +71,7 @@ export class LandingPageComponent {
     console.log("Individuos: ")
     this.getIndividuos();
     this.getAllContratos();
+    this.getActive();
   }
 
   //Funcion para asignar el path al endpoint para procesar solicitudes
@@ -92,6 +95,17 @@ export class LandingPageComponent {
     this.viewSrv.get(this.pathE).subscribe({
       next: (result) => {
         this.viewDatos = result;
+      },
+      error: (error) => {
+        console.log("Error: "+error);
+      }
+    })
+  }
+  //muestra solamente los datos de empleados activos
+  getActive(){
+    this.viewSrv.get(this.pathE).subscribe({
+      next: (result) => {
+        this.viewActive = result.filter((dato: Empleado) => dato.estado);
       },
       error: (error) => {
         console.log("Error: "+error);
@@ -189,6 +203,17 @@ export class LandingPageComponent {
       }
     })
   };
+  //Funcion para obtener un solo contrato
+  getContratoById(id: number){
+    this.contratoSrv.get("/"+id).subscribe({
+      next:(result)=>{
+        this.contratoSend = result;
+      },
+      error: (error) => {
+        console.log("Error: "+error);
+      }
+    })
+  }
 
   updateAll(){
     this.updateEmpleado().then(()=>{
@@ -315,7 +340,6 @@ export class LandingPageComponent {
     })
   }
 
-
   showDatos(){
     this.viewSrv.get(this.pathE).subscribe({
       next:(result)=>{
@@ -353,6 +377,7 @@ export class LandingPageComponent {
 
   onCheckBoxChange(event: Event,idEmpleado:number ): void {
     const trg = event.target as HTMLInputElement;
+    this.idBaja=idEmpleado;
     this.view.idEmpleado=idEmpleado;
     this.contratoSend.idEmpleado=idEmpleado;
     this.individuo.idEmpleado=idEmpleado;
@@ -366,5 +391,51 @@ export class LandingPageComponent {
     console.log(this.view);
   }
 
+//Funcion para "procesar una baja", que cambia el estado del empleado
+procesarBaja(){
+  this.getAllContratos();
+    // const Idbaja = this.individuos.filter(dato => {dato.idEmpleado==id});
+    const idE = this.contratraciones.filter(dato=>dato.idEmpleado===this.idBaja);
+    const idBorrar = idE[0].idContratacion;
 
+    this.getContratoById(idBorrar);
+    console.log(this.contratoSend);
+    this.contratoSend.idContratacion=idBorrar;
+    this.contratoSend.idDepartamento=idE[0].idDepartamento;
+    this.contratoSend.idEmpleado=idE[0].idEmpleado;
+    this.contratoSend.idCargo= idE[0].idCargo;
+    this.contratoSend.idTipoContratacion= idE[0].idTipoContratacion;
+    this.contratoSend.fechaContratacion=idE[0].fechaContratacion;
+    this.contratoSend.salario= idE[0].salario;
+    console.log(this.contratoSend);
+    this.contratoSend.estado= false;
+    this.contratoSrv.post("/"+idBorrar,{
+      "accion":"actualizar",
+      "json":this.contratoSend,
+    }).
+    subscribe({
+      next: (result) => {
+        Swal.fire({
+          position: "center",
+          icon: "success",
+          title: "Baja procesada exitosamente exitosa",
+          showConfirmButton: false,
+          timer: 1500
+        }).then(()=>{
+          location.reload()
+        })
+      },
+      error: (error) => {
+        Swal.fire({
+          position: "center",
+          icon: "error",
+          title: "Hubo un error al procesar la baja",
+          showConfirmButton: true,
+        });
+
+      }
+    })
+
+};
 }
+

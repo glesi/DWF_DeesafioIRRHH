@@ -44,7 +44,6 @@ export class CRUDDepartamentosComponent {
     };
   }
 
-
   getDepartamento() {
     // if (this.departamentoSend.idDepartamento > 0){
     //   this.path = '/'+this.departamentoSend.idDepartamento;
@@ -80,7 +79,9 @@ export class CRUDDepartamentosComponent {
       "json": this.departamentoSend,
 
     }
-    if(this.departamentoSend.nombreDepartamento.trim().length > 0 || this.departamentoSend.descripcionDepartamento.trim().length > 0 ){
+    console.log(this.departamentoSend.nombreDepartamento.trim().length > 0)
+    console.log(this.departamentoSend.descripcionDepartamento.trim().length > 0)
+    if(this.departamentoSend.nombreDepartamento.trim().length > 0 && this.departamentoSend.descripcionDepartamento.trim().length > 0 ){
       this.departamentoSrv.post(this.path,object).subscribe({
         next: (result) => {
           Swal.fire({

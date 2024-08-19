@@ -10,6 +10,7 @@ export interface Empleado {
   nombreDepartamento: string;
   numeroTelefono: string;
   tipoContratacion: string;
+  estado: boolean;
 }
 export interface TipoContratacion {
   idTipoContratacion: number;

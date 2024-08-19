@@ -28,7 +28,7 @@
       </tr>
       </thead>
       <tbody>
-      <tr  *ngFor="let dato of viewDatos; let i=index" id="tablaEmpleados">
+      <tr  *ngFor="let dato of viewActive; let i=index" id="tablaEmpleados">
         <td>{{dato.idEmpleado}}</td>
         <td>{{dato.numeroDui}}</td>
         <td>{{dato.nombrePersona}}</td>
@@ -321,7 +321,7 @@
             <input type="submit"
                    class="btn btn-danger"
                    value="Delete"
-                   (click)="deleteBoth()">
+                   (click)="procesarBaja()">
           </div>
         </form>
       </div>

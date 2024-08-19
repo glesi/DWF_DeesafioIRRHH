@@ -29,7 +29,8 @@ public class ViewRepository {
                         double salario = rs.getDouble("salario");
                         Date fechaNacimiento = rs.getDate("fechaNacimiento");
                         String tipoContratacion = rs.getString("tipoContratacion");
-                        View viewObj = new View(idEmpleado,numeroDui,nombrePersona,numeroTelefono,correoInstitucional,cargo,nombreDepartamento, fechaContratacion,salario,fechaNacimiento, tipoContratacion);
+                        boolean estado = rs.getBoolean("estado");
+                        View viewObj = new View(idEmpleado,numeroDui,nombrePersona,numeroTelefono,correoInstitucional,cargo,nombreDepartamento, fechaContratacion,salario,fechaNacimiento, tipoContratacion,estado);
                         views.add(viewObj);
                     }
                 }catch (SQLException e){
@@ -66,8 +67,9 @@ public class ViewRepository {
                         double salario = rs.getDouble("salario");
                         Date fechaNacimiento = rs.getDate("fechaNacimiento");
                         String tipoContratacion = rs.getString("tipoContratacion");
+                        boolean estado = rs.getBoolean("estado");
 
-                        viewObj = new View(idEmpleado, numeroDui, nombrePersona, numeroTelefono, correoInstitucional, cargo, nombreDepartamento, fechaContratacion, salario, fechaNacimiento, tipoContratacion);
+                        viewObj = new View(idEmpleado, numeroDui, nombrePersona, numeroTelefono, correoInstitucional, cargo, nombreDepartamento, fechaContratacion, salario, fechaNacimiento, tipoContratacion,estado);
                     }
                 } catch (SQLException e) {
                     System.out.println("Error al intentar obtener registro de empleado " + id + "." + e.getMessage());
