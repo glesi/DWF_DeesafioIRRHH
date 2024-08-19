@@ -12,7 +12,7 @@ public class ContratacionesServices {
     public ContratacionesServices() {
         this.contratacionesRepository = new ContratacionesRepository();
     }
-
+    //las llamadas a los diferentes metodos del repository
     // Método para crear una nueva contratación
     public Contrataciones crearContratacion(Contrataciones contratacion) {
         return contratacionesRepository.crearContratacion(contratacion);
