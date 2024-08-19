@@ -38,13 +38,14 @@ public class ViewRepository {
                 System.out.println("Error al llamar el stored procedure. Reason: "+e.getMessage());
             }
         } finally {
-            if (con != null) Conexion.desconectar();
+            try{
+                if (con != null) con.close();
+            }catch (SQLException e){
+                System.err.println("Error al cerrar la consulta."+e.getMessage());
+            }
         }
-
         return views;
-
     }
-
     public View getViewById(int id) {
         View viewObj = null;
         Connection con = null;
@@ -97,8 +98,14 @@ public class ViewRepository {
                     System.out.println("Error al intentar eliminar registro: "+idEmpleado+e.getMessage());
                     return false;
                 }
+
         }finally{
-            if (con != null) Conexion.desconectar();
+            try{
+                if (con != null) con.close();
+            }catch (SQLException e){
+                System.err.println("Error al intentar eliminar registro: "+idEmpleado+e.getMessage());
+            }
+
         }
         }
 

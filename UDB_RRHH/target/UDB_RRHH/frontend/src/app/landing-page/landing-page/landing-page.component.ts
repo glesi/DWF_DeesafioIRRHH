@@ -58,6 +58,8 @@ export class LandingPageComponent {
   //variable para path de endpoint
   pathE :string = '';
   pathA: string= '';
+  pathC: string='';
+  ahora: Date = new Date();
 
   ngOnInit(): void {
     this.getCargo();
@@ -65,13 +67,24 @@ export class LandingPageComponent {
     this.getTipoContratacion();
     this.getDepartamentos();
     this.getIndividuos();
+    this.getAllContratos();
   }
 
+  //Funcion para asignar el path al endpoint para procesar solicitudes
   assingPath(){
     this.pathE='/';
     if(this.view.idEmpleado>0){
       this.pathE += this.view.idEmpleado.toString();
     }
+  }
+  //funcion para asignar path para hacer las peticiones a la tabla contrataciones
+  assignPathContrato(id: number ){
+    this.pathC='/'+id;
+  }
+  //funcion para obtener la fecha de hoy
+  getToday(){
+    const today = new Date();
+    this.ahora = today;
   }
 //Funcion para obtener todos los datos en la vista
   getViewDatos(){
@@ -168,6 +181,18 @@ export class LandingPageComponent {
       }
     })
   };
+  //Funcion para obtener todos los datos de los contratos
+  getAllContratos(){
+    this.contratoSrv.get(this.pathA).subscribe({
+      next:(result)=>{
+        this.contratraciones = result;
+        console.log(result);
+      },
+      error: (error)=>{
+        console.log("Error: "+error);
+      }
+    })
+  };
 
   updateAll(){
     this.updateEmpleado().then(()=>{
@@ -194,7 +219,7 @@ export class LandingPageComponent {
   async updateContrato(){
     try {
       const result = await lastValueFrom(
-        this.contratoSrv.post(this.pathE, {
+        this.contratoSrv.post(this.pathC, {
           accion: "actualizar",
           json: this.contratoSend,
         })
@@ -215,23 +240,34 @@ export class LandingPageComponent {
   }
 
 //Enviar peticion de agreagar registro a tablas empleado y contrataciones
-  saveAll(){
-    this.saveEmpleado().then(()=>{
-      this.getLatestRecord().then(()=>{
-        this.saveContrato().then(()=>{
-          console.log("finished");
-        });
-      })
-    });
-
-
+  async saveAll(){
+    console.log("fecha contrato "+this.contratoAdd.fechaContratacion);
+    // if(new Date(this.contratoAdd.fechaContratacion)<this.ahora){
+    //   Swal.fire({
+    //     position: "center",
+    //     icon: "warning",
+    //     title: 'La fecha de contratacion no puede ser menor que el dia de ahora',
+    //     showConfirmButton: true,
+    //   });
+    //   return;
+    // }
+    // this.saveEmpleado().then(()=>{
+    //   this.getLatestRecord().then(()=>{
+    //     this.saveContrato().then(()=>{
+    //       console.log("finished");
+    //     });
+    //   })
+    // });
+    await this.saveEmpleado();
   }
-//obtener idEmpleado para nuevo registro en tabala contrataciones
+//obtener idEmpleado para nuevo registro en tabla contrataciones
   async getLatestRecord() {
+    // setTimeout( () => { /*Your Code*/ }, 3000 )
     this.getIndividuos();
       const newData: Individuo[] = this.individuos;
+      console.log(JSON.stringify(newData));
       const lastId = newData.reduce((max,current)=>{
-        console.log("current "+current,"max"+max);
+        console.log("current "+current.idEmpleado,"max "+max.idEmpleado );
         return current.idEmpleado> max.idEmpleado ? current : max;
 
       }).idEmpleado;
@@ -239,8 +275,9 @@ export class LandingPageComponent {
       this.contratoAdd.idEmpleado = lastId;
   }
 //guardar reistro en tabla empleados
-  async saveEmpleado() {
+  async saveEmpleado(): Promise<void> {
     console.log(this.individuoAdd);
+
     try {
       const result = await lastValueFrom(
         this.empleadoSrv.post(this.pathA, {
@@ -253,6 +290,7 @@ export class LandingPageComponent {
     } catch (error) {
       console.log("Error:", error);
     }
+  return this.getLatestRecord();
   }
 //guardar regiostro en tabala contrataciones
   async saveContrato() {
@@ -272,9 +310,9 @@ export class LandingPageComponent {
         showConfirmButton: false,
         timer: 1500,
       })
-        .then(() => {
-        location.reload();
-      });
+      //   .then(() => {
+      //   location.reload();
+      // });
     } catch (error) {
       console.log("Error:", error);
     }
@@ -315,8 +353,9 @@ export class LandingPageComponent {
         const resultado = this.individuos.filter(dato => dato.idEmpleado === result.idEmpleado);
         const resCargos= this.todosLosCargos.filter(dato=> dato.cargo===result.cargo);
         const resDept= this.departamentos.filter(dato => {dato.idDepartamento===result.idDepartamento});
+        const resContratos= this.contratraciones.filter(dato=> dato.idEmpleado===result.idEmpleado);
+        console.log(resContratos);
         this.view = result;
-        console.log(this.contratoSend)
         this.individuo.idEmpleado= result.idEmpleado;
         this.individuo.numeroDui= result.numeroDui;
         this.individuo.nombrePersona= result.nombrePersona;
@@ -324,13 +363,15 @@ export class LandingPageComponent {
         this.individuo.numeroTelefono= result.numeroTelefono;
         this.individuo.correoInstitucional= result.correoInstitucional;
         this.individuo.fechaNacimiento= result.fechaNacimiento;
-        console.log("Fecha Nac "+this.individuo.fechaNacimiento)
         this.individuo.usuario= resultado[0].usuario;
         this.contratoSend.salario = result.salario;
         this.contratoSend.fechaContratacion= result.fechaContratacion;
-        console.log("Fecha Contrato "+this.contratoSend.fechaContratacion);
         this.depto.nombreDepartamento= result.nombreDepartamento;
+        this.contratoSend.idContratacion = resContratos[0].idContratacion;
+        console.log(this.contratoSend.idContratacion);
         this.contratoSend.idCargo = result.idCargo;
+        this.assignPathContrato(this.contratoSend.idContratacion);
+
 
 
       },
@@ -351,6 +392,7 @@ export class LandingPageComponent {
     this.getViewDatosById();
     this.getCargoById();
     this.getDepartamentos();
+    console.log(this.pathE);
     console.log(this.view);
   }
 

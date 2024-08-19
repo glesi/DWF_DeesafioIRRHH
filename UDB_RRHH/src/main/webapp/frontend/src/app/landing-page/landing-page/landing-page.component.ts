@@ -59,6 +59,7 @@ export class LandingPageComponent {
   pathE :string = '';
   pathA: string= '';
   pathC: string='';
+  ahora: Date = new Date();
 
   ngOnInit(): void {
     this.getCargo();
@@ -69,14 +70,21 @@ export class LandingPageComponent {
     this.getAllContratos();
   }
 
+  //Funcion para asignar el path al endpoint para procesar solicitudes
   assingPath(){
     this.pathE='/';
     if(this.view.idEmpleado>0){
       this.pathE += this.view.idEmpleado.toString();
     }
   }
+  //funcion para asignar path para hacer las peticiones a la tabla contrataciones
   assignPathContrato(id: number ){
     this.pathC='/'+id;
+  }
+  //funcion para obtener la fecha de hoy
+  getToday(){
+    const today = new Date();
+    this.ahora = today;
   }
 //Funcion para obtener todos los datos en la vista
   getViewDatos(){
@@ -232,23 +240,34 @@ export class LandingPageComponent {
   }
 
 //Enviar peticion de agreagar registro a tablas empleado y contrataciones
-  saveAll(){
-    this.saveEmpleado().then(()=>{
-      this.getLatestRecord().then(()=>{
-        this.saveContrato().then(()=>{
-          console.log("finished");
-        });
-      })
-    });
-
-
+  async saveAll(){
+    console.log("fecha contrato "+this.contratoAdd.fechaContratacion);
+    // if(new Date(this.contratoAdd.fechaContratacion)<this.ahora){
+    //   Swal.fire({
+    //     position: "center",
+    //     icon: "warning",
+    //     title: 'La fecha de contratacion no puede ser menor que el dia de ahora',
+    //     showConfirmButton: true,
+    //   });
+    //   return;
+    // }
+    // this.saveEmpleado().then(()=>{
+    //   this.getLatestRecord().then(()=>{
+    //     this.saveContrato().then(()=>{
+    //       console.log("finished");
+    //     });
+    //   })
+    // });
+    await this.saveEmpleado();
   }
-//obtener idEmpleado para nuevo registro en tabala contrataciones
+//obtener idEmpleado para nuevo registro en tabla contrataciones
   async getLatestRecord() {
+    // setTimeout( () => { /*Your Code*/ }, 3000 )
     this.getIndividuos();
       const newData: Individuo[] = this.individuos;
+      console.log(JSON.stringify(newData));
       const lastId = newData.reduce((max,current)=>{
-        console.log("current "+current,"max"+max);
+        console.log("current "+current.idEmpleado,"max "+max.idEmpleado );
         return current.idEmpleado> max.idEmpleado ? current : max;
 
       }).idEmpleado;
@@ -256,8 +275,9 @@ export class LandingPageComponent {
       this.contratoAdd.idEmpleado = lastId;
   }
 //guardar reistro en tabla empleados
-  async saveEmpleado() {
+  async saveEmpleado(): Promise<void> {
     console.log(this.individuoAdd);
+
     try {
       const result = await lastValueFrom(
         this.empleadoSrv.post(this.pathA, {
@@ -270,6 +290,7 @@ export class LandingPageComponent {
     } catch (error) {
       console.log("Error:", error);
     }
+  return this.getLatestRecord();
   }
 //guardar regiostro en tabala contrataciones
   async saveContrato() {
@@ -289,9 +310,9 @@ export class LandingPageComponent {
         showConfirmButton: false,
         timer: 1500,
       })
-        .then(() => {
-        location.reload();
-      });
+      //   .then(() => {
+      //   location.reload();
+      // });
     } catch (error) {
       console.log("Error:", error);
     }
