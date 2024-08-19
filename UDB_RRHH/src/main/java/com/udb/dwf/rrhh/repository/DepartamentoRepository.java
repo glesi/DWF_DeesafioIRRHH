@@ -39,7 +39,7 @@ public class DepartamentoRepository {
             try {
                 if (generatedKeys != null) generatedKeys.close();
                 if (preparedStatement != null) preparedStatement.close();
-                if (connection != null) Conexion.desconectar();
+                if (connection != null) connection.close();
             } catch (SQLException e) {
                 System.err.println("Error al cerrar los recursos. Reason: " + e.getMessage());
             }
@@ -75,7 +75,7 @@ public class DepartamentoRepository {
             try{
                 if (resultSet != null) resultSet.close();
                 if (preparedStatement != null) preparedStatement.close();
-                if (connection != null) Conexion.desconectar();
+                if (connection != null) connection.close();
             }catch (SQLException e){
                 System.err.println("Error al cerrar los recursos. Reason: " + e.getMessage());
             }
@@ -108,7 +108,7 @@ public class DepartamentoRepository {
         } finally {
             try {
                 if (preparedStatement != null) preparedStatement.close();
-                if (connection != null) Conexion.desconectar();
+                if (connection != null) connection.close();
             } catch (SQLException e) {
                 System.err.println("Error al cerrar los recursos. Reason: " + e.getMessage());
             }
@@ -135,7 +135,7 @@ public class DepartamentoRepository {
         } finally {
             try {
                 if (preparedStatement != null) preparedStatement.close();
-                if (connection != null) Conexion.desconectar();
+                if (connection != null) connection.close();
             } catch (SQLException e) {
                 System.err.println("Error al cerrar los recursos. Reason: " + e.getMessage());
             }
@@ -169,7 +169,7 @@ public class DepartamentoRepository {
             try {
                 if (resultSet != null) resultSet.close();
                 if (preparedStatement != null) preparedStatement.close();
-                if (connection != null) Conexion.desconectar();
+                if (connection != null) connection.close();
             } catch (SQLException e) {
                 System.err.println("Error al cerrar los recursos. Reason: " + e.getMessage());
             }

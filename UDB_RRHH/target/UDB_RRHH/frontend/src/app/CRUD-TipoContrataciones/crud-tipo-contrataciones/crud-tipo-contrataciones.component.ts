@@ -34,6 +34,12 @@ export class CRUDTipoContratacionesComponent {
       this.path = '/'+this.contratracionesSend.idTipoContratacion;
     }
   }
+  //Funcion para volver los valores del elemento contatacionesSend a default
+  resetContratacionesSend(){
+    this.contratracionesSend={
+          idTipoContratacion:0,
+          tipoContratacion:''}
+  }
 
   getTipoContrataciones() {
     // if(this.contratracionesSend.idTipoContratacion>0){

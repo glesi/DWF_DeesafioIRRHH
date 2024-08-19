@@ -27,6 +27,7 @@ public class Conexion {
     public static void desconectar() {
         if (conexion != null) {
             try {
+                System.out.println("Conexion Cerrada");
                 conexion.close();
             } catch (SQLException e) {
                 System.err.println("Error al cerrar la conexión. Reason: " + e.getMessage());

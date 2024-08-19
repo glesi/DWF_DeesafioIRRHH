@@ -33,6 +33,13 @@ export class CRUDCargoComponent {
       this.path = '/'+this.cargoSend.idCargo;
     }
   }
+  resetCargoSend(){
+    this.cargoSend ={
+      idCargo:0,
+      cargo:'',
+      descripcionCargo:'',
+      jefatura: false}
+  }
   getCargos(){
     this.cargoSrv.get(this.path).subscribe({
     next:(result)=>{
