@@ -306,8 +306,10 @@ export class LandingPageComponent {
         showConfirmButton: false,
         timer: 1500,
       })
-        .then(() => {
-        location.reload();
+        .then((
+
+        ) => {
+          location.reload();
       });
     } catch (error) {
       console.log("Error:", error);
@@ -339,6 +341,7 @@ export class LandingPageComponent {
       }
     })
   }
+
 
   showDatos(){
     this.viewSrv.get(this.pathE).subscribe({
@@ -397,6 +400,7 @@ procesarBaja(){
     // const Idbaja = this.individuos.filter(dato => {dato.idEmpleado==id});
     const idE = this.contratraciones.filter(dato=>dato.idEmpleado===this.idBaja);
     const idBorrar = idE[0].idContratacion;
+    console.log(idBorrar);
 
     this.getContratoById(idBorrar);
     console.log(this.contratoSend);
