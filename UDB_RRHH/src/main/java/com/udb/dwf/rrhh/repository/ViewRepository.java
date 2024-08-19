@@ -1,5 +1,6 @@
 package com.udb.dwf.rrhh.repository;
 
+import com.udb.dwf.rrhh.config.Conexion;
 import com.udb.dwf.rrhh.pojos.View;
 
 import java.sql.*;
@@ -48,13 +49,11 @@ public class ViewRepository {
     }
     public View getViewById(int id) {
         View viewObj = null;
-        Connection con = null;
-        try{
-            con = Conexion.getConexion();
+        try (Connection con = Conexion.getConexion()) {
             String query = "{call ObtenerEmpleadoById(?)}";
-            try(CallableStatement sp = con.prepareCall(query)){
+            try (CallableStatement sp = con.prepareCall(query)) {
                 sp.setInt(1, id);
-                try(ResultSet rs= sp.executeQuery()){
+                try (ResultSet rs = sp.executeQuery()) {
                     while (rs.next()) {
                         int idEmpleado = rs.getInt("idEmpleado");
                         String numeroDui = rs.getString("numeroDui");
@@ -68,17 +67,18 @@ public class ViewRepository {
                         Date fechaNacimiento = rs.getDate("fechaNacimiento");
                         String tipoContratacion = rs.getString("tipoContratacion");
 
-                        viewObj = new View(idEmpleado,numeroDui,nombrePersona,numeroTelefono,correoInstitucional,cargo,nombreDepartamento,fechaContratacion,salario,fechaNacimiento,tipoContratacion);
+                        viewObj = new View(idEmpleado, numeroDui, nombrePersona, numeroTelefono, correoInstitucional, cargo, nombreDepartamento, fechaContratacion, salario, fechaNacimiento, tipoContratacion);
                     }
-                }catch(SQLException e){
-                    System.out.println("Error al intentar obtener registro de empleado "+id+"."+e.getMessage());
+                } catch (SQLException e) {
+                    System.out.println("Error al intentar obtener registro de empleado " + id + "." + e.getMessage());
                 }
 
-            }catch (SQLException e) {
-                System.out.println("Error al intentar ejecutar stored procedure"+e.getMessage());
+            } catch (SQLException e) {
+                System.out.println("Error al intentar ejecutar stored procedure" + e.getMessage());
             }
-        }finally {
-            if (con != null) Conexion.desconectar();
+        } catch (SQLException e) {
+            System.out.println("Error al manejar conexion" + e.getMessage());
+            throw new RuntimeException(e);
         }
         return viewObj;
 
@@ -107,6 +107,6 @@ public class ViewRepository {
             }
 
         }
-        }
+    }
 
 }

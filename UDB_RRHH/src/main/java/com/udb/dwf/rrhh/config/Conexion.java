@@ -1,4 +1,4 @@
-package com.udb.dwf.rrhh.repository;
+package com.udb.dwf.rrhh.config;
 
 import java.sql.Connection;
 import java.sql.DriverManager;

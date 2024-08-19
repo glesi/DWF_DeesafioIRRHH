@@ -1,5 +1,6 @@
 package com.udb.dwf.rrhh.repository;
 
+import com.udb.dwf.rrhh.config.Conexion;
 import com.udb.dwf.rrhh.pojos.Empleado;
 
 import java.sql.Connection;
