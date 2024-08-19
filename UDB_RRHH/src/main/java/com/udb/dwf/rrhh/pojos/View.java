@@ -14,9 +14,10 @@ public class View {
     private double salario;
     private Date fechaNacimiento;
     private String tipoContratacion;
+    private boolean estado;
 
 
-    public View (int idEmpleado, String numeroDui, String nombrePersona, String numeroTelefono, String correoInstitucional, String cargo,String nombreDepartamento, Date fechaContratacion, double salario, Date fechaNacimiento, String tipoContratacion) {
+    public View (int idEmpleado, String numeroDui, String nombrePersona, String numeroTelefono, String correoInstitucional, String cargo,String nombreDepartamento, Date fechaContratacion, double salario, Date fechaNacimiento, String tipoContratacion, boolean estado) {
         this.idEmpleado = idEmpleado;
         this.numeroDui = numeroDui;
         this.nombrePersona = nombrePersona;
@@ -28,6 +29,15 @@ public class View {
         this.fechaNacimiento = fechaNacimiento;
         this.nombreDepartamento = nombreDepartamento;
         this.tipoContratacion = tipoContratacion;
+        this.estado = estado;
+    }
+
+    public boolean isEstado() {
+        return estado;
+    }
+
+    public void setEstado(boolean estado) {
+        this.estado = estado;
     }
 
     public String getTipoContratacion() {

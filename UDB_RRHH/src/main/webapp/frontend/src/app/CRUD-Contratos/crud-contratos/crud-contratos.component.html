@@ -1,1 +1,79 @@
-<p>crud-contratos works!</p>
+
+<div class="container">
+  <div class="table-wrapper">
+    <div class="table-title">
+      <div class="row ">
+        <div class="col-sm-6">
+          <h2>Attrition Summary</h2>
+      </div>
+        <div class="col-sm-5">
+          <a href="#addEmployeeModal" class="btn btn-success" data-toggle="modal"><i class="material-icons">&#xE147;</i> <span>Agregar</span></a>
+        </div>
+    </div>
+    </div>
+    <table class="table table-striped table-hover text-center">
+      <thead>
+      <tr>
+        <th class="text-center">ID</th>
+        <th class="text-center" >Dui</th>
+        <th class="text-center">Nombre</th>
+        <th class="text-center">Telefono</th>
+        <th class="text-center">Cargo</th>
+        <th class="text-center">Departamento</th>
+        <th class="text-center" >Contratado en</th>
+        <th class="text-center" >Salario</th>
+        <th class="text-center">Cumpleaños</th>
+        <th class="text-center">Tipo de Contrato</th>
+        <th class="text-center">Actions</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr  *ngFor="let dato of viewInactive; let i=index" id="tablaEmpleados">
+        <td>{{dato.idEmpleado}}</td>
+        <td>{{dato.numeroDui}}</td>
+        <td>{{dato.nombrePersona}}</td>
+        <td>{{dato.numeroTelefono}}</td>
+        <td>{{dato.cargo}}</td>
+        <td>{{dato.nombreDepartamento}}</td>
+        <td>{{dato.fechaContratacion}}</td>
+        <td>{{dato.salario}}</td>
+        <td>{{dato.fechaNacimiento}}</td>
+        <td>{{dato.tipoContratacion}}</td>
+        <td>
+          <a href="#deleteEmployeeModal" class="delete" data-toggle="modal" (click)="onCheckBoxChange($event,dato.idEmpleado)"><i class="material-icons" data-toggle="tooltip" title="Delete">&#xE872;</i></a>
+        </td>
+      </tr>
+      </tbody>
+    </table>
+
+    <!-- Delete Modal HTML -->
+    <div id="deleteEmployeeModal" class="modal fade">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <form>
+            <div class="modal-header">
+              <h4 class="modal-title">Delete Employee</h4>
+              <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+            </div>
+            <div class="modal-body">
+              <p>Are you sure you want to delete these Records?</p>
+              <p class="text-warning"><small>This action cannot be undone.</small></p>
+            </div>
+            <div class="modal-footer">
+              <input type="button" class="btn btn-default" data-dismiss="modal" value="Cancel">
+              <input type="submit"
+                     class="btn btn-danger"
+                     value="Delete"
+                     (click)="deleteBoth()">
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+
+  <router-outlet></router-outlet>
+</div>
+
