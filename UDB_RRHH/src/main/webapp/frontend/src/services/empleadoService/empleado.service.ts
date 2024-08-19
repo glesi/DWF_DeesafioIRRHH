@@ -11,12 +11,12 @@ export class EmpleadoService {
 
   constructor(private httpClient : HttpClient) { }
 
-  get(): Observable<any> {
+  get(path: string): Observable<any> {
     return this.httpClient.get(this.API_URL).pipe(res => res);
   }
 
-  post(object : any): Observable<any> {
-    return this.httpClient.post(this.API_URL, object).pipe(res => res);
+  post(path:string, object : any): Observable<any> {
+    return this.httpClient.post(this.API_URL+path, object).pipe(res => res);
   }
 
 }

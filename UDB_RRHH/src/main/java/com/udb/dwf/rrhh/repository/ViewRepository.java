@@ -23,10 +23,12 @@ public class ViewRepository {
                         String numeroTelefono = rs.getString("numeroTelefono");
                         String correoInstitucional = rs.getString("correoInstitucional");
                         String cargo = rs.getString("cargo");
-                        Date fechaContratacion = rs.getDate("fechaNacimiento");
+                        String nombreDepartamento = rs.getString("nombreDepartamento");
+                        Date fechaContratacion = rs.getDate("fechaContratacion");
                         double salario = rs.getDouble("salario");
                         Date fechaNacimiento = rs.getDate("fechaNacimiento");
-                        View viewObj = new View(idEmpleado,numeroDui,nombrePersona,numeroTelefono,correoInstitucional,cargo,fechaContratacion,salario,fechaNacimiento);
+                        String tipoContratacion = rs.getString("tipoContratacion");
+                        View viewObj = new View(idEmpleado,numeroDui,nombrePersona,numeroTelefono,correoInstitucional,cargo,nombreDepartamento, fechaContratacion,salario,fechaNacimiento, tipoContratacion);
                         views.add(viewObj);
                     }
                 }catch (SQLException e){
@@ -36,20 +38,22 @@ public class ViewRepository {
                 System.out.println("Error al llamar el stored procedure. Reason: "+e.getMessage());
             }
         } finally {
-            if (con != null) Conexion.desconectar();
+            try{
+                if (con != null) con.close();
+            }catch (SQLException e){
+                System.err.println("Error al cerrar la consulta."+e.getMessage());
+            }
         }
-
         return views;
-
     }
-
     public View getViewById(int id) {
         View viewObj = null;
         Connection con = null;
         try{
             con = Conexion.getConexion();
-            String query = "{call ObtenerDatosEmpleadosById(idEmpleado)}";
+            String query = "{call ObtenerEmpleadoById(?)}";
             try(CallableStatement sp = con.prepareCall(query)){
+                sp.setInt(1, id);
                 try(ResultSet rs= sp.executeQuery()){
                     while (rs.next()) {
                         int idEmpleado = rs.getInt("idEmpleado");
@@ -58,17 +62,20 @@ public class ViewRepository {
                         String numeroTelefono = rs.getString("numeroTelefono");
                         String correoInstitucional = rs.getString("correoInstitucional");
                         String cargo = rs.getString("cargo");
-                        Date fechaContratacion = rs.getDate("fechaNacimiento");
+                        String nombreDepartamento = rs.getString("nombreDepartamento");
+                        Date fechaContratacion = rs.getDate("fechaContratacion");
                         double salario = rs.getDouble("salario");
                         Date fechaNacimiento = rs.getDate("fechaNacimiento");
-                        viewObj = new View(idEmpleado,numeroDui,nombrePersona,numeroTelefono,correoInstitucional,cargo,fechaContratacion,salario,fechaNacimiento);
+                        String tipoContratacion = rs.getString("tipoContratacion");
+
+                        viewObj = new View(idEmpleado,numeroDui,nombrePersona,numeroTelefono,correoInstitucional,cargo,nombreDepartamento,fechaContratacion,salario,fechaNacimiento,tipoContratacion);
                     }
                 }catch(SQLException e){
                     System.out.println("Error al intentar obtener registro de empleado "+id+"."+e.getMessage());
                 }
 
             }catch (SQLException e) {
-                System.out.println("Error al intentar ejecutar storeed procedure"+e.getMessage());
+                System.out.println("Error al intentar ejecutar stored procedure"+e.getMessage());
             }
         }finally {
             if (con != null) Conexion.desconectar();
@@ -76,4 +83,30 @@ public class ViewRepository {
         return viewObj;
 
     }
+
+    public boolean eliminaViewElements(int idEmpleado){
+        Connection con = null;
+
+        try{
+            con = Conexion.getConexion();
+            String query = "{call deleteContratacionAndEmpleadoByIdEmpleado(?)}";
+            try (CallableStatement sp = con.prepareCall(query)){
+                sp.setInt(1, idEmpleado);
+                int affectedRows = sp.executeUpdate();
+                    return affectedRows>0;
+                }catch (SQLException e){
+                    System.out.println("Error al intentar eliminar registro: "+idEmpleado+e.getMessage());
+                    return false;
+                }
+
+        }finally{
+            try{
+                if (con != null) con.close();
+            }catch (SQLException e){
+                System.err.println("Error al intentar eliminar registro: "+idEmpleado+e.getMessage());
+            }
+
+        }
+        }
+
 }

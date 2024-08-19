@@ -11,13 +11,12 @@
     </servlet>
     <servlet-mapping>
         <servlet-name>ViewController</servlet-name>
-        <url-pattern>/vista</url-pattern>
+        <url-pattern>/vista/*</url-pattern>
     </servlet-mapping>
 
     <welcome-file-list>
         <welcome-file>index.jsp</welcome-file>
     </welcome-file-list>
-
 
 
 </web-app>

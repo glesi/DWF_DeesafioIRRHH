@@ -9,11 +9,14 @@ public class View {
     private String numeroTelefono;
     private String correoInstitucional;
     private String cargo;
+    private String nombreDepartamento;
     private Date fechaContratacion;
     private double salario;
     private Date fechaNacimiento;
+    private String tipoContratacion;
 
-    public View(int idEmpleado, String numeroDui, String nombrePersona, String numeroTelefono, String correoInstitucional, String cargo, Date fechaContratacion, double salario, Date fechaNacimiento) {
+
+    public View (int idEmpleado, String numeroDui, String nombrePersona, String numeroTelefono, String correoInstitucional, String cargo,String nombreDepartamento, Date fechaContratacion, double salario, Date fechaNacimiento, String tipoContratacion) {
         this.idEmpleado = idEmpleado;
         this.numeroDui = numeroDui;
         this.nombrePersona = nombrePersona;
@@ -23,6 +26,24 @@ public class View {
         this.fechaContratacion = fechaContratacion;
         this.salario = salario;
         this.fechaNacimiento = fechaNacimiento;
+        this.nombreDepartamento = nombreDepartamento;
+        this.tipoContratacion = tipoContratacion;
+    }
+
+    public String getTipoContratacion() {
+        return tipoContratacion;
+    }
+
+    public void setTipoContratacion(String tipoContratacion) {
+        this.tipoContratacion = tipoContratacion;
+    }
+
+    public String getNombreDepartamento() {
+        return nombreDepartamento;
+    }
+
+    public void setNombreDepartamento(String nombreDepartamento) {
+        this.nombreDepartamento = nombreDepartamento;
     }
 
     public int getIdEmpleado() {

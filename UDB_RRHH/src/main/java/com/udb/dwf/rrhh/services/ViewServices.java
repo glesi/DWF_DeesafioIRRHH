@@ -17,4 +17,8 @@ public class ViewServices {
     public View getViewById(int idEmpleado){
         return viewRepository.getViewById(idEmpleado);
     }
+
+    public boolean eliminarView(int idEmpleado){
+        return this.viewRepository.eliminaViewElements(idEmpleado);
+    }
 }

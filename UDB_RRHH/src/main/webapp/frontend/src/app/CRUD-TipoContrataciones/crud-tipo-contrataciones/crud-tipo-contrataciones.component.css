@@ -174,20 +174,17 @@ table.table .avatar {
 }
 .custom-checkbox input[type="checkbox"]:checked + label:before {
   border-color: #03A9F4;
-  background: white;
+  background: #03A9F4;
 }
-
 .custom-checkbox input[type="checkbox"]:checked + label:after {
-  border-color: #03A9F4;
+  border-color: #fff;
 }
 .custom-checkbox input[type="checkbox"]:disabled + label:before {
-  color: #03A9F4;
+  color: #b8b8b8;
   cursor: auto;
   box-shadow: none;
   background: #ddd;
-
 }
-
 /* Modal styles */
 .modal .modal-dialog {
   max-width: 400px;
@@ -359,7 +356,7 @@ tbody tr:hover {
     border: 1px solid #2ba6cb;
   }
 
-  table td {
+  .table td {
     border: none;
     border-bottom: 1px solid #dddddd;
     position: relative;

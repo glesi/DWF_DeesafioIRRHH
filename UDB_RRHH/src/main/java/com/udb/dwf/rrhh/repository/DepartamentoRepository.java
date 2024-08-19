@@ -39,7 +39,7 @@ public class DepartamentoRepository {
             try {
                 if (generatedKeys != null) generatedKeys.close();
                 if (preparedStatement != null) preparedStatement.close();
-                if (connection != null) Conexion.desconectar();
+                if (connection != null) connection.close();
             } catch (SQLException e) {
                 System.err.println("Error al cerrar los recursos. Reason: " + e.getMessage());
             }
@@ -75,7 +75,7 @@ public class DepartamentoRepository {
             try{
                 if (resultSet != null) resultSet.close();
                 if (preparedStatement != null) preparedStatement.close();
-                if (connection != null) Conexion.desconectar();
+                if (connection != null) connection.close();
             }catch (SQLException e){
                 System.err.println("Error al cerrar los recursos. Reason: " + e.getMessage());
             }
@@ -92,11 +92,12 @@ public class DepartamentoRepository {
 
         try {
             connection = Conexion.getConexion();
-            String query = "UPDATE Departamento SET idDepartamento,nombreDepartamento,descripcionDepartamento = ?, WHERE idepartamento = ?";
+            String query = "UPDATE Departamento SET idDepartamento =?,nombreDepartamento=?,descripcionDepartamento = ? WHERE idDepartamento = ?";
             preparedStatement = connection.prepareStatement(query);
             preparedStatement.setInt(1, departamento.getIdDepartamento());
             preparedStatement.setString(2, departamento.getNombreDepartamento());
             preparedStatement.setString( 3, departamento.getDescripcionDepartamento());
+            preparedStatement.setInt( 4, departamento.getIdDepartamento());
 
             int affectedRows = preparedStatement.executeUpdate();
             return affectedRows > 0;
@@ -107,7 +108,7 @@ public class DepartamentoRepository {
         } finally {
             try {
                 if (preparedStatement != null) preparedStatement.close();
-                if (connection != null) Conexion.desconectar();
+                if (connection != null) connection.close();
             } catch (SQLException e) {
                 System.err.println("Error al cerrar los recursos. Reason: " + e.getMessage());
             }
@@ -134,7 +135,7 @@ public class DepartamentoRepository {
         } finally {
             try {
                 if (preparedStatement != null) preparedStatement.close();
-                if (connection != null) Conexion.desconectar();
+                if (connection != null) connection.close();
             } catch (SQLException e) {
                 System.err.println("Error al cerrar los recursos. Reason: " + e.getMessage());
             }
@@ -168,7 +169,7 @@ public class DepartamentoRepository {
             try {
                 if (resultSet != null) resultSet.close();
                 if (preparedStatement != null) preparedStatement.close();
-                if (connection != null) Conexion.desconectar();
+                if (connection != null) connection.close();
             } catch (SQLException e) {
                 System.err.println("Error al cerrar los recursos. Reason: " + e.getMessage());
             }
