@@ -36,6 +36,15 @@ export class CRUDDepartamentosComponent {
     }
   }
 
+  resetDepartamentoSend() {
+    this.departamentoSend = {
+      idDepartamento: 0,
+      nombreDepartamento: '',
+      descripcionDepartamento: ''
+    };
+  }
+
+
   getDepartamento() {
     // if (this.departamentoSend.idDepartamento > 0){
     //   this.path = '/'+this.departamentoSend.idDepartamento;

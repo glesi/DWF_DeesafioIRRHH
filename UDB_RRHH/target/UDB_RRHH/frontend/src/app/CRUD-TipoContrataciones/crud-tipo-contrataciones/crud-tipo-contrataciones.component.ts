@@ -1,4 +1,4 @@
-import {Component, ViewChild} from '@angular/core';
+import {Component} from '@angular/core';
 import {CommonModule} from "@angular/common";
 import {TipoContratacion} from "../../Interfaces/Interfaces";
 import {RouterLink, RouterLinkActive, RouterOutlet} from "@angular/router";

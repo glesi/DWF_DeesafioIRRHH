@@ -1,4 +1,4 @@
-import {Component, NO_ERRORS_SCHEMA} from '@angular/core';
+import {Component} from '@angular/core';
 import { TipoContratacionService } from '../../../services/tipoContratacionService/tipoContratacion.service';
 import {ViewService} from "../../../services/viewService/view.service";
 import {CommonModule, NgFor} from "@angular/common";
@@ -9,9 +9,10 @@ import {EmpleadoService} from "../../../services/empleadoService/empleado.servic
 import {ContratacionService} from "../../../services/contratacionService/contratacion.service";
 import Swal from "sweetalert2";
 import {FormsModule, ReactiveFormsModule} from "@angular/forms";
-import {resolve} from "node:path";
 import {DepartamentoService} from "../../../services/departamentoService/departamento.service";
-
+import { formatDate } from '@angular/common';
+import {lastValueFrom, switchMap} from "rxjs";
+import {get} from "node:http";
 
 
 @Component({
@@ -26,7 +27,6 @@ import {DepartamentoService} from "../../../services/departamentoService/departa
     ReactiveFormsModule],
   templateUrl: './landing-page.component.html',
   styleUrl: './landing-page.component.css',
-  schemas: [NO_ERRORS_SCHEMA]
 })
 
 
@@ -41,36 +41,46 @@ export class LandingPageComponent {
               ) {}
 
   viewDatos:Empleado[] =[];
-  view: Empleado={idEmpleado:0,numeroDui:'', nombrePersona:'', numeroTelefono:'',correoInstitucional:'',cargo:'',fechaContratacion:'',salario:0,fechaNacimiento:''};
+  view: Empleado={idEmpleado:0,numeroDui:'', nombrePersona:'', numeroTelefono:'',correoInstitucional:'',cargo:'', nombreDepartamento:'',fechaContratacion:new Date(),salario:0,fechaNacimiento: new Date(), tipoContratacion:''};
   contratraciones: Contrataciones[]=[];
   contratoSend: Contrataciones={idContratacion: 0, idDepartamento:0, idEmpleado:0, idCargo:0, idTipoContratacion:0,fechaContratacion:"",salario:0,estado:true,};
+  contratoAdd: Contrataciones={idContratacion: 0, idDepartamento:0, idEmpleado:0, idCargo:0, idTipoContratacion:0,fechaContratacion:"",salario:0,estado:true,};
   todosLosTipos: TipoContratacion[]=[];
   tiposContratos: TipoContratacion={idTipoContratacion:0, tipoContratacion:''};
   individuo: Individuo={idEmpleado:0,numeroDui:'',nombrePersona:'',usuario:'',numeroTelefono:'', correoInstitucional:'',fechaNacimiento:''};
+  individuos : Individuo[]=[];
+  individuoAdd: Individuo={idEmpleado:0,numeroDui:'',nombrePersona:'',usuario:'',numeroTelefono:'', correoInstitucional:'',fechaNacimiento:''};
   todosLosCargos: Cargo[]=[];
   cargo : Cargo ={idCargo:0,cargo:'',descripcionCargo:'', jefatura: false};
   departamentos: Departamento[]=[];
+  depto : Departamento ={idDepartamento:0,nombreDepartamento:'', descripcionDepartamento:'' }
 
   //variable para path de endpoint
-  path :string = '';
+  pathE :string = '';
+  pathA: string= '';
+  pathC: string='';
 
   ngOnInit(): void {
     this.getCargo();
     this.getViewDatos();
     this.getTipoContratacion();
-    this.getTipoContratacion();
     this.getDepartamentos();
+    this.getIndividuos();
+    this.getAllContratos();
   }
 
   assingPath(){
-    this.path='/';
+    this.pathE='/';
     if(this.view.idEmpleado>0){
-      this.path += this.view.idEmpleado.toString();
+      this.pathE += this.view.idEmpleado.toString();
     }
+  }
+  assignPathContrato(id: number ){
+    this.pathC='/'+id;
   }
 //Funcion para obtener todos los datos en la vista
   getViewDatos(){
-    this.viewSrv.get(this.path).subscribe({
+    this.viewSrv.get(this.pathE).subscribe({
       next: (result) => {
         this.viewDatos = result;
         console.log(this.viewDatos);
@@ -80,9 +90,21 @@ export class LandingPageComponent {
       }
     })
   }
+
+  getIndividuos(){
+    this.empleadoSrv.get(this.pathE).subscribe({
+      next: (result) => {
+        this.individuos = result;
+        console.log(this.individuos);
+      },
+      error: (error) => {
+        console.log("Error: "+error);
+      }
+    })
+  }
 //Funcion para obtener solamente un dato
   getViewDatosById(){
-    this.viewSrv.get(this.path).subscribe({
+    this.viewSrv.get(this.pathE).subscribe({
       next:(result)=>{
         this.view = result;
     },
@@ -93,7 +115,7 @@ export class LandingPageComponent {
   }
 //Funcion para obtener todos los cargos
   getCargo(){
-    this.cargoSrv.get(this.path).subscribe({
+    this.cargoSrv.get(this.pathA).subscribe({
       next: (result)=>{
         this.todosLosCargos = result;
       },
@@ -104,7 +126,7 @@ export class LandingPageComponent {
   }
   //Funcion para obtener un solo cargo
   getCargoById(){
-    this.cargoSrv.get(this.path).subscribe({
+    this.cargoSrv.get(this.pathA).subscribe({
       next:(result)=>{
         this.cargo = result;
       },
@@ -115,7 +137,7 @@ export class LandingPageComponent {
   }
   //Funcion para obtener todos los tipos de contratacion
   getTipoContratacion(){
-    this.tipoContratacionService.get(this.path).subscribe({
+    this.tipoContratacionService.get(this.pathA).subscribe({
       next:(result)=>{
         this.todosLosTipos=result;
         console.log(result);
@@ -128,7 +150,7 @@ export class LandingPageComponent {
   }
   //Funcion para obtener un solo tipo de contratacion
   getTipoContratacionById(){
-    this.tipoContratacionService.get(this.path).subscribe({
+    this.tipoContratacionService.get(this.pathA).subscribe({
       next:(result)=>{
         this.tiposContratos=result;
         console.log(result);
@@ -141,7 +163,7 @@ export class LandingPageComponent {
   }
   //Funcion para obtener todos los departamentos
   getDepartamentos(){
-    this.dptoSrv.get(this.path).subscribe({
+    this.dptoSrv.get(this.pathA).subscribe({
       next:(result)=>{
         this.departamentos = result;
         console.log(result);
@@ -151,57 +173,138 @@ export class LandingPageComponent {
       }
     })
   };
-
-
-
-  saveEmpleado(){
-    var object = {
-      "accion": "insertar",
-      "json": this.individuo,
-    }
-    this.empleadoSrv.post(this.path,object).subscribe({
-      next: (result)=>{
-        console.log("Empleado guardado exitosamente: "+result);
-
-        this.contratoSend.idEmpleado=this.individuo.idEmpleado;
-        console.log("id empleado"+this.contratoSend.idEmpleado)
-        this.saveContrato();
+  //Funcion para obtener todos los datos de los contratos
+  getAllContratos(){
+    this.contratoSrv.get(this.pathA).subscribe({
+      next:(result)=>{
+        this.contratraciones = result;
+        console.log(result);
       },
-      error: (error) => {
+      error: (error)=>{
         console.log("Error: "+error);
       }
     })
+  };
+
+  updateAll(){
+    this.updateEmpleado().then(()=>{
+      this.updateContrato().then(()=>{
+        console.log("finish");
+      })
+    });
+  };
+
+  async updateEmpleado(){
+    try {
+      const result = await lastValueFrom(
+        this.empleadoSrv.post(this.pathE, {
+          accion: "actualizar",
+          json: this.individuo,
+        })
+      );
+      console.log(result);
+    } catch (error) {
+      console.log("Error:", error);
+    }
   }
 
-  saveContrato(){
-    var object = {
-      "accion": "insertar",
-      "json": this.contratoSend,
-    }
-    console.log(this.contratoSend.idEmpleado);
-    this.contratoSrv.post(this.path,object).subscribe({
-      next: (result)=>{
-        Swal.fire({
-          position: 'center',
-          icon: "success",
-          title:"El registro se ha agregado con exito",
-          showConfirmButton: false,
-          timer: 1500
+  async updateContrato(){
+    try {
+      const result = await lastValueFrom(
+        this.contratoSrv.post(this.pathC, {
+          accion: "actualizar",
+          json: this.contratoSend,
         })
-      },
-      error:(error)=>{
-        console.log(error);
-      }
+      );
+      console.log(result);
+      Swal.fire({
+        position: "center",
+        icon: "success",
+        title: "El registro se ha agregado con éxito",
+        showConfirmButton: false,
+        timer: 1500,
+      }).then(() => {
+        location.reload();
+      });
+    } catch (error) {
+      console.log("Error:", error);
+    }
+  }
+
+//Enviar peticion de agreagar registro a tablas empleado y contrataciones
+  saveAll(){
+    this.saveEmpleado().then(()=>{
+      this.getLatestRecord().then(()=>{
+        this.saveContrato().then(()=>{
+          console.log("finished");
+        });
+      })
     });
+
+
+  }
+//obtener idEmpleado para nuevo registro en tabala contrataciones
+  async getLatestRecord() {
+    this.getIndividuos();
+      const newData: Individuo[] = this.individuos;
+      const lastId = newData.reduce((max,current)=>{
+        console.log("current "+current,"max"+max);
+        return current.idEmpleado> max.idEmpleado ? current : max;
+
+      }).idEmpleado;
+      console.log(lastId);
+      this.contratoAdd.idEmpleado = lastId;
+  }
+//guardar reistro en tabla empleados
+  async saveEmpleado() {
+    console.log(this.individuoAdd);
+    try {
+      const result = await lastValueFrom(
+        this.empleadoSrv.post(this.pathA, {
+          accion: "insertar",
+          json: this.individuoAdd,
+
+        })
+      );
+      console.log(result);
+    } catch (error) {
+      console.log("Error:", error);
+    }
+  }
+//guardar regiostro en tabala contrataciones
+  async saveContrato() {
+    console.log(this.contratoAdd);
+    try {
+      const result = await lastValueFrom(
+        this.contratoSrv.post(this.pathA, {
+          accion: "insertar",
+          json: this.contratoAdd,
+        })
+      );
+      console.log(result);
+      Swal.fire({
+        position: "center",
+        icon: "success",
+        title: "El registro se ha agregado con éxito",
+        showConfirmButton: false,
+        timer: 1500,
+      })
+        .then(() => {
+        location.reload();
+      });
+    } catch (error) {
+      console.log("Error:", error);
+    }
   }
 //Funcion para eliminar registros de dos tablas, empleados y contrataciones
 //usa un stored procedure en el backend
   deleteBoth(){
     var object ={
       "accion": "eliminar",
-      "json": this.individuo,
+      "json": this.view,
     }
-    this.viewSrv.post(this.path,object).subscribe({
+    console.log(this.pathE);
+    this.viewSrv.post(this.pathE,object).subscribe({
       next: (result)=>{
         Swal.fire({
           position: 'center',
@@ -209,9 +312,49 @@ export class LandingPageComponent {
           title: 'Registro eliminado',
           showConfirmButton: false,
           timer: 1500
+        }).then(()=>{
+          location.reload();
+          console.log(result);
         })
       },
       error:(error)=>{
+        console.log("Error: "+JSON.stringify(error));
+      }
+    })
+  }
+
+
+
+  showDatos(){
+    this.viewSrv.get(this.pathE).subscribe({
+      next:(result)=>{
+        console.log(result);
+        const resultado = this.individuos.filter(dato => dato.idEmpleado === result.idEmpleado);
+        const resCargos= this.todosLosCargos.filter(dato=> dato.cargo===result.cargo);
+        const resDept= this.departamentos.filter(dato => {dato.idDepartamento===result.idDepartamento});
+        const resContratos= this.contratraciones.filter(dato=> dato.idEmpleado===result.idEmpleado);
+        console.log(resContratos);
+        this.view = result;
+        this.individuo.idEmpleado= result.idEmpleado;
+        this.individuo.numeroDui= result.numeroDui;
+        this.individuo.nombrePersona= result.nombrePersona;
+        this.individuo.usuario= result.usuario;
+        this.individuo.numeroTelefono= result.numeroTelefono;
+        this.individuo.correoInstitucional= result.correoInstitucional;
+        this.individuo.fechaNacimiento= result.fechaNacimiento;
+        this.individuo.usuario= resultado[0].usuario;
+        this.contratoSend.salario = result.salario;
+        this.contratoSend.fechaContratacion= result.fechaContratacion;
+        this.depto.nombreDepartamento= result.nombreDepartamento;
+        this.contratoSend.idContratacion = resContratos[0].idContratacion;
+        console.log(this.contratoSend.idContratacion);
+        this.contratoSend.idCargo = result.idCargo;
+        this.assignPathContrato(this.contratoSend.idContratacion);
+
+
+
+      },
+      error: (error) => {
         console.log("Error: "+error);
       }
     })
@@ -222,8 +365,15 @@ export class LandingPageComponent {
     this.view.idEmpleado=idEmpleado;
     this.contratoSend.idEmpleado=idEmpleado;
     this.individuo.idEmpleado=idEmpleado;
-    this.assingPath();
     this.getViewDatosById();
-    console.log(this.view.idEmpleado);
+    this.assingPath();
+    this.showDatos();
+    this.getViewDatosById();
+    this.getCargoById();
+    this.getDepartamentos();
+    console.log(this.pathE);
+    console.log(this.view);
   }
+
+
 }

@@ -1,13 +1,15 @@
 export interface Empleado {
   correoInstitucional: string;
   idEmpleado: number;
-  fechaNacimiento: string;
-  fechaContratacion: string;
+  fechaNacimiento: Date;
+  fechaContratacion: Date ;
   numeroDui: string;
   salario: number;
   nombrePersona: string;
   cargo: string;
+  nombreDepartamento: string;
   numeroTelefono: string;
+  tipoContratacion: string;
 }
 export interface TipoContratacion {
   idTipoContratacion: number;

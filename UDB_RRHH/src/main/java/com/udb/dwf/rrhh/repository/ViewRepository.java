@@ -23,10 +23,12 @@ public class ViewRepository {
                         String numeroTelefono = rs.getString("numeroTelefono");
                         String correoInstitucional = rs.getString("correoInstitucional");
                         String cargo = rs.getString("cargo");
-                        Date fechaContratacion = rs.getDate("fechaNacimiento");
+                        String nombreDepartamento = rs.getString("nombreDepartamento");
+                        Date fechaContratacion = rs.getDate("fechaContratacion");
                         double salario = rs.getDouble("salario");
                         Date fechaNacimiento = rs.getDate("fechaNacimiento");
-                        View viewObj = new View(idEmpleado,numeroDui,nombrePersona,numeroTelefono,correoInstitucional,cargo,fechaContratacion,salario,fechaNacimiento);
+                        String tipoContratacion = rs.getString("tipoContratacion");
+                        View viewObj = new View(idEmpleado,numeroDui,nombrePersona,numeroTelefono,correoInstitucional,cargo,nombreDepartamento, fechaContratacion,salario,fechaNacimiento, tipoContratacion);
                         views.add(viewObj);
                     }
                 }catch (SQLException e){
@@ -59,10 +61,13 @@ public class ViewRepository {
                         String numeroTelefono = rs.getString("numeroTelefono");
                         String correoInstitucional = rs.getString("correoInstitucional");
                         String cargo = rs.getString("cargo");
-                        Date fechaContratacion = rs.getDate("fechaNacimiento");
+                        String nombreDepartamento = rs.getString("nombreDepartamento");
+                        Date fechaContratacion = rs.getDate("fechaContratacion");
                         double salario = rs.getDouble("salario");
                         Date fechaNacimiento = rs.getDate("fechaNacimiento");
-                        viewObj = new View(idEmpleado,numeroDui,nombrePersona,numeroTelefono,correoInstitucional,cargo,fechaContratacion,salario,fechaNacimiento);
+                        String tipoContratacion = rs.getString("tipoContratacion");
+
+                        viewObj = new View(idEmpleado,numeroDui,nombrePersona,numeroTelefono,correoInstitucional,cargo,nombreDepartamento,fechaContratacion,salario,fechaNacimiento,tipoContratacion);
                     }
                 }catch(SQLException e){
                     System.out.println("Error al intentar obtener registro de empleado "+id+"."+e.getMessage());
