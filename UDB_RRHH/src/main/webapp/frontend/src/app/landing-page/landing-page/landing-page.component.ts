@@ -66,6 +66,7 @@ export class LandingPageComponent {
     this.getViewDatos();
     this.getTipoContratacion();
     this.getDepartamentos();
+    console.log("Individuos: ")
     this.getIndividuos();
     this.getAllContratos();
   }
@@ -91,7 +92,6 @@ export class LandingPageComponent {
     this.viewSrv.get(this.pathE).subscribe({
       next: (result) => {
         this.viewDatos = result;
-        console.log(this.viewDatos);
       },
       error: (error) => {
         console.log("Error: "+error);
@@ -103,7 +103,6 @@ export class LandingPageComponent {
     this.empleadoSrv.get(this.pathE).subscribe({
       next: (result) => {
         this.individuos = result;
-        console.log(this.individuos);
       },
       error: (error) => {
         console.log("Error: "+error);
@@ -148,7 +147,6 @@ export class LandingPageComponent {
     this.tipoContratacionService.get(this.pathA).subscribe({
       next:(result)=>{
         this.todosLosTipos=result;
-        console.log(result);
       },
       error:(error)=>{
         console.log("Error: "+error);
@@ -174,7 +172,6 @@ export class LandingPageComponent {
     this.dptoSrv.get(this.pathA).subscribe({
       next:(result)=>{
         this.departamentos = result;
-        console.log(result);
       },
       error: (error)=>{
         console.log("Error: "+error);
@@ -186,7 +183,6 @@ export class LandingPageComponent {
     this.contratoSrv.get(this.pathA).subscribe({
       next:(result)=>{
         this.contratraciones = result;
-        console.log(result);
       },
       error: (error)=>{
         console.log("Error: "+error);
@@ -241,60 +237,35 @@ export class LandingPageComponent {
 
 //Enviar peticion de agreagar registro a tablas empleado y contrataciones
   async saveAll(){
-    console.log("fecha contrato "+this.contratoAdd.fechaContratacion);
-    // if(new Date(this.contratoAdd.fechaContratacion)<this.ahora){
-    //   Swal.fire({
-    //     position: "center",
-    //     icon: "warning",
-    //     title: 'La fecha de contratacion no puede ser menor que el dia de ahora',
-    //     showConfirmButton: true,
-    //   });
-    //   return;
-    // }
-    // this.saveEmpleado().then(()=>{
-    //   this.getLatestRecord().then(()=>{
-    //     this.saveContrato().then(()=>{
-    //       console.log("finished");
-    //     });
-    //   })
-    // });
     await this.saveEmpleado();
-  }
-//obtener idEmpleado para nuevo registro en tabla contrataciones
-  async getLatestRecord() {
-    // setTimeout( () => { /*Your Code*/ }, 3000 )
-    this.getIndividuos();
-      const newData: Individuo[] = this.individuos;
-      console.log(JSON.stringify(newData));
-      const lastId = newData.reduce((max,current)=>{
-        console.log("current "+current.idEmpleado,"max "+max.idEmpleado );
-        return current.idEmpleado> max.idEmpleado ? current : max;
-
-      }).idEmpleado;
-      console.log(lastId);
-      this.contratoAdd.idEmpleado = lastId;
   }
 //guardar reistro en tabla empleados
   async saveEmpleado(): Promise<void> {
-    console.log(this.individuoAdd);
-
     try {
       const result = await lastValueFrom(
         this.empleadoSrv.post(this.pathA, {
           accion: "insertar",
           json: this.individuoAdd,
-
         })
       );
-      console.log(result);
+      if(result){
+        const allNew = await lastValueFrom(
+          this.empleadoSrv.get("/")
+        )
+        const id= allNew.reduce((max: Empleado ,current:Empleado)=>{
+          return current.idEmpleado> max.idEmpleado ? current : max;
+        }).idEmpleado;
+        await this.saveContrato(id);
+      } else{
+        console.log("Algo paso")
+      }
     } catch (error) {
       console.log("Error:", error);
     }
-  return this.getLatestRecord();
   }
-//guardar regiostro en tabala contrataciones
-  async saveContrato() {
-    console.log(this.contratoAdd);
+//guardar registro en tabla contrataciones
+  async saveContrato(id:number) {
+    this.contratoAdd.idEmpleado = id;
     try {
       const result = await lastValueFrom(
         this.contratoSrv.post(this.pathA, {
@@ -310,9 +281,9 @@ export class LandingPageComponent {
         showConfirmButton: false,
         timer: 1500,
       })
-      //   .then(() => {
-      //   location.reload();
-      // });
+        .then(() => {
+        location.reload();
+      });
     } catch (error) {
       console.log("Error:", error);
     }
@@ -343,7 +314,6 @@ export class LandingPageComponent {
       }
     })
   }
-
 
 
   showDatos(){
