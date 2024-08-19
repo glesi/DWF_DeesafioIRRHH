@@ -7,6 +7,7 @@ import {NgModule} from "@angular/core";
 import {AppComponent} from "./app.component";
 import {CRUDDepartamentosComponent} from "./CRUD-Departamentos/crud-departamentos/crud-departamentos.component";
 import {CRUDCargoComponent} from "./CRUD-Cargo/crud-cargo/crud-cargo.component";
+import {CRUDContratosComponent} from "./CRUD-Contratos/crud-contratos/crud-contratos.component";
 
 export const routes: Routes = [
       {path:'', redirectTo: 'landing-page', pathMatch: 'full'},
@@ -14,5 +15,7 @@ export const routes: Routes = [
       {path: 'crud-tipo-contrataciones', component: CRUDTipoContratacionesComponent},
       {path: 'crud-departamentos', component: CRUDDepartamentosComponent},
       {path: 'crud-cargo', component: CRUDCargoComponent},
+      {path: 'crud-contratos', component: CRUDContratosComponent},
 
 ];
+

@@ -4,7 +4,7 @@
     <div class="table-title">
       <div class="row ">
         <div class="col-sm-6">
-          <h2>Manage <b>Employees</b></h2>
+          <h2>Manage Employees</h2>
         </div>
         <div class="col-sm-5">
           <a href="#addEmployeeModal" class="btn btn-success" data-toggle="modal"><i class="material-icons">&#xE147;</i> <span>Agregar</span></a>
@@ -28,7 +28,7 @@
       </tr>
       </thead>
       <tbody>
-      <tr  *ngFor="let dato of viewActive; let i=index" id="tablaEmpleados">
+      <tr  *ngFor="let dato of viewDatos; let i=index" id="tablaEmpleados">
         <td>{{dato.idEmpleado}}</td>
         <td>{{dato.numeroDui}}</td>
         <td>{{dato.nombrePersona}}</td>
@@ -61,127 +61,6 @@
 <!--    </div>-->
 <!--  </div>-->
   <!-- Add Modal HTML -->
-  <div id="addEmployeeModal" class="modal fade">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <form (ngSubmit)="saveAll()">
-          <div class="modal-header">
-            <h4 class="modal-title">Agregar Empleado</h4>
-            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-          </div>
-          <div class="modal-body">
-            <div class="form-group">
-              <label>Numero De DUI</label>
-              <input type="text" class="form-control"
-                     id="dui"
-                     required
-                     pattern="\d{9}"
-                     placeholder="00000000-0"
-                     [(ngModel)]="individuoAdd.numeroDui"
-                     name="dui-send">
-            </div>
-            <div class="form-group">
-              <label>Nombre</label>
-              <input type="text" class="form-control"
-                     required
-                     id="Nombre"
-                     [(ngModel)]="individuoAdd.nombrePersona"
-                     name="nombre-send">
-            </div>
-            <div class="form-group">
-              <label>Usuario</label>
-              <input class="form-control"
-                     required
-                     id="Usuario"
-                     [(ngModel)]="individuoAdd.usuario"
-                     name="user-send">
-            </div>
-            <div class="form-group">
-              <label>Telefono</label>
-              <input type="tel" class="form-control"
-                     required
-                     id="telefono"
-                     [(ngModel)]="individuoAdd.numeroTelefono"
-                     name="phone-send">
-            </div>
-            <div class="form-group">
-              <label>Correo</label>
-              <input type="email" class="form-control"
-                     required
-                     id="correo"
-                     [(ngModel)]="individuoAdd.correoInstitucional"
-                     name="email-send">
-            </div>
-            <div class="form-group">
-              <label>Fecha De Nacimiento</label>
-              <input type="date" class="form-control"
-                     required
-                     id="nac"
-                     [(ngModel)]="individuoAdd.fechaNacimiento"
-                     name="bday-send">
-            </div>
-            <div class="form-group">
-              <label>Fecha De Contratacion</label>
-              <input type="date" class="form-control"
-                     required
-                     id="cont"
-                     [(ngModel)]="contratoAdd.fechaContratacion"
-                     name="contratacionDate-send"
-                     max="ahora">
-            </div>
-            <div class="form-group">
-              <label for="cargoSelect">Cargo</label>
-              <select class="form-control"
-                      required
-                      id="cargoSelect"
-                      [(ngModel)]="contratoAdd.idCargo"
-                      name="idCargo-send">
-                <option value="">Selecciona un valor</option>
-                <option *ngFor="let cargo of todosLosCargos" [value]="cargo.idCargo">{{cargo.cargo}}</option>
-
-              </select>
-            </div>
-            <div class="form-group">
-              <label for="contratacionSelect">Tipo de Contratacion</label>
-              <select class="form-control"
-                      id="contratacionSelect"
-                      required
-                      [(ngModel)]="contratoAdd.idTipoContratacion"
-                      name="idCargo-send">
-                <option value="">Selecciona un valor</option>
-                <option *ngFor="let tipo of todosLosTipos" [value]="tipo.idTipoContratacion">{{tipo.tipoContratacion}}</option>
-              </select>
-            </div>
-            <div class="form-group">
-              <label for="contratacionSelect">Departamento</label>
-              <select class="form-control"
-                      id="DepartamentoSelect"
-                      required
-                      [(ngModel)]="contratoAdd.idDepartamento"
-                      name="dpto-send">
-                <option value="">Selecciona un valor</option>
-                <option *ngFor="let dpto of departamentos" [value]="dpto.idDepartamento">{{dpto.nombreDepartamento}}</option>
-              </select>
-            </div>
-            <div class="form-group">
-              <label>Salario</label>
-              <input type="text" class="form-control"
-                     required
-                     id="salario"
-                     pattern="^\d+(\.\d{1,2})?$"
-                     placeholder="0.00"
-                     [(ngModel)]="contratoAdd.salario"
-                     name="salario-send">
-            </div>
-          </div>
-          <div class="modal-footer">
-            <input type="button" class="btn btn-default" data-dismiss="modal" value="Cancelar">
-            <input type="submit" class="btn btn-success" value="Agregar">
-          </div>
-        </form>
-      </div>
-    </div>
-  </div>
   <!-- Edit Modal HTML -->
     <div id="editEmployeeModal" class="modal fade">
       <div class="modal-dialog">
@@ -321,7 +200,7 @@
             <input type="submit"
                    class="btn btn-danger"
                    value="Delete"
-                   (click)="procesarBaja()">
+                   (click)="deleteBoth()">
           </div>
         </form>
       </div>
