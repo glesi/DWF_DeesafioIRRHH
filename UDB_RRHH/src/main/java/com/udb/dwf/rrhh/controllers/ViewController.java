@@ -134,6 +134,7 @@ public class ViewController extends HttpServlet {
     }
     private void deleteBoth(Integer id, HttpServletRequest request, HttpServletResponse response)
             throws IOException{
+
         String pathInfo = request.getPathInfo();
         if (pathInfo == null || pathInfo.length()>1) {
             services.eliminarView(id);
